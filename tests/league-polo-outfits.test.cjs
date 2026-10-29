@@ -7,4 +7,6 @@ for(const color of ['black','blue','purple','red','pink']){
 }
 assert.match(html,/cornilleau_league:'코닐리우 리그전'/);
 assert.match(html,/q\.k==='league_polo'/);
+assert.match(html,/case 'league_polo':ctx\.fillStyle=q\.b;/);
+assert.match(html,/ctx\.lineTo\(ux\+12\*s,top\+th\*\.12\)/);
 console.log('Five league polo colorways await the Cornilleau League championship');
