@@ -405,7 +405,8 @@ root.PingPhysics={shortLeft,EQUIP,back,retreatAt,incomingRetreat,OFF_T,DEEP_M,DE
 const $=id=>document.getElementById(id),canvas=$('court'),P=PingPhysics;
 let ctx=canvas.getContext('2d');
 const ANDROID_LOW_SPEC=window.Capacitor?.getPlatform?.()==='android';
-const renderPixelRatio=()=>ANDROID_LOW_SPEC?1:Math.min(devicePixelRatio||1,2);
+/* 1.5× keeps the match canvas crisp on phone screens without the full battery cost of native DPR. */
+const renderPixelRatio=()=>ANDROID_LOW_SPEC?Math.min(devicePixelRatio||1,1.5):Math.min(devicePixelRatio||1,2);
 if(ANDROID_LOW_SPEC)document.documentElement.classList.add('low-spec');
 /* 캔버스 그림자 흐림(shadowBlur)은 안드로이드 WebView에서 가장 무거운 그리기라 저사양에서는 끈다. *//* 매 프레임 같은 글자를 다시 써서 생기는 레이아웃·다시 그리기를 막는다: 값이 같으면 쓰지 않는다. */if(ANDROID_LOW_SPEC){for(const [o,k] of [[Node.prototype,'textContent'],[Element.prototype,'innerHTML']]){const d=Object.getOwnPropertyDescriptor(o,k);Object.defineProperty(o,k,{configurable:true,get(){return d.get.call(this);},set(v){if(this.nodeType===1&&this.childElementCount<=8&&d.get.call(this)===String(v))return;d.set.call(this,v);}});}}if(ANDROID_LOW_SPEC){const sb=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'shadowBlur');Object.defineProperty(CanvasRenderingContext2D.prototype,'shadowBlur',{configurable:true,get(){return 0;},set(){sb.set.call(this,0);}});}
 const myName=()=>String(store.get('nick')||googleUser?.displayName||'선수').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12)||'선수';
