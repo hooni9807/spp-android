@@ -1779,11 +1779,6 @@ if(R.lens){ctx.beginPath();ctx.ellipse(0,y0+9,hw*.36,4.6,0,0,Math.PI*2);ctx.fill
 if(type==='jpen'){ctx.beginPath();ctx.ellipse(0,y0+R.hl*.42,hw*.72,hw*.62,0,0,Math.PI*2);ctx.fillStyle='#c9a46b';ctx.fill();ctx.fillStyle='#a8834e70';for(const [px,py] of [[-2,-1],[1.5,1],[0,-2.5],[2.5,-2],[-1.5,2]]){ctx.fillRect(px,y0+R.hl*.42+py,.8,.8);}}
 if(type==='cpen'){ctx.beginPath();ctx.ellipse(0,y0+R.hl*.55,hw*.55,hw*.45,0,0,Math.PI*2);ctx.fillStyle='#8f6a3f';ctx.fill();}
 if(skin)grip(R,type,face===BLACK,skin,y0);
-// Every regional championship adds one trophy to the orbit.  The saved IDs are
-// filtered through TOUR_REWARDS so an old or malformed save can never break a
-// live rally render.
-const orbitRewards=typeof trophyIds==='function'&&Array.isArray(TOUR_REWARDS)?trophyIds().map(id=>TOUR_REWARDS.find(r=>r.id===id)).filter(Boolean):[];
-if(showEnhanceFx)for(let i=0;i<orbitRewards.length;i++){const reward=orbitRewards[i],colors=reward.colors||skinColors,count=orbitRewards.length,orbit=time*2.2+i*Math.PI*2/count,spread=1.5+Math.min(.48,count*.12),fx=Math.cos(orbit)*R.w*spread,fy=-H*.08+Math.sin(orbit)*R.h*spread;ctx.save();ctx.translate(fx,fy);ctx.rotate(Math.sin(orbit)*.12);ctx.scale(.78,.78);ctx.shadowColor=colors[0];ctx.shadowBlur=7;ctx.fillStyle=colors[1];ctx.beginPath();ctx.moveTo(-7,-5);ctx.lineTo(7,-5);ctx.lineTo(4,3);ctx.quadraticCurveTo(0,7,-4,3);ctx.closePath();ctx.fill();ctx.fillRect(-1.7,6,3.4,4);ctx.fillRect(-6,10,12,2);ctx.strokeStyle=colors[0];ctx.lineWidth=1;ctx.stroke();ctx.fillStyle=colors[0];ctx.beginPath();ctx.arc(-2.6,-1.8,1.4,0,Math.PI*2);ctx.fill();ctx.restore();}
 ctx.restore();
 }
 // The hand on the racket, in racket space (head toward -y, handle toward +y), per grip:
