@@ -22,8 +22,8 @@ async function rankLevel(xp, remoteRows) {
   return nodes['rank-list'].children.map(li => li.children[3].textContent);
 }
 
-test('local and cloud level rankings use the current experience thresholds', async () => {
-  for (const [xp, expected] of [[0, 1], [1899, 19], [1900, 20], [2029, 20], [2030, 21], [2190, 22], [4550, 30], [5050, 31]]) {
+test('Lv 1~10 stays quick while later levels use the slower progression thresholds', async () => {
+  for (const [xp, expected] of [[0, 1], [999, 10], [1000, 11], [1299, 11], [1300, 12], [8499, 20], [8500, 21], [9999, 21], [10000, 22]]) {
     assert.equal((await rankLevel(xp, null))[0], `Lv ${expected}`, `local XP ${xp}`);
     assert.equal((await rankLevel(0, [{ name: '상대', xp, chars: 1 }]))[0], `Lv ${expected}`, `cloud XP ${xp}`);
   }
