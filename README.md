@@ -18,7 +18,7 @@
 
 ## Android APK
 
-`main`에 푸시하면 GitHub Actions의 **Android APK** 작업이 고정 서명된 설치용 release APK와 Play Store 업로드용 AAB를 만듭니다. [최신 SPP.apk 바로 다운로드](https://github.com/hooni9807/spp/releases/download/android-latest/SPP.apk)로 ZIP 없이 바로 받을 수 있습니다. 빌드가 끝나기 전에는 직전 버전이 유지됩니다. 로컬에서는 Android Studio·SDK를 설치한 뒤 `npm ci && npm run android:apk`을 실행하면 `android/app/build/outputs/apk/debug/app-debug.apk`가 생성됩니다.
+`main`에 푸시하면 GitHub Actions의 **Android APK** 작업이 고정 서명된 설치용 release APK와 Play Store 업로드용 AAB를 만듭니다. [최신 SPP.apk 바로 다운로드](https://github.com/hooni9807/spp-android/releases/download/android-latest/SPP.apk)로 ZIP 없이 바로 받을 수 있습니다. 빌드가 끝나기 전에는 직전 버전이 유지됩니다. 로컬에서는 Android Studio·SDK를 설치한 뒤 `npm ci && npm run android:apk`을 실행하면 `android/app/build/outputs/apk/debug/app-debug.apk`가 생성됩니다.
 
 앱의 Google/Firebase 로그인에는 Firebase Authentication의 승인된 도메인에 `localhost`를 추가해야 합니다. Play Store 배포는 별도 서명 키와 release AAB 빌드가 필요합니다.
 
