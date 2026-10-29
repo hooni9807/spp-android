@@ -3611,12 +3611,12 @@ const mb=document.createElement('button');mb.type='button';mb.dataset.stage='1';
 const bb=document.createElement('button');bb.type='button';bb.dataset.board='stage';bb.setAttribute('role','tab');bb.textContent='스테이지 돌파';document.querySelector('[data-board="inf"]').after(bb);
 }
 // 시너지 (롤토체스 특성처럼): 증강마다 시너지 1개. 같은 시너지를 3개 / 5개 모으면 보너스가 켜진다.
-const SYN={스나이퍼:{ids:'deft rhythm double light help jewel crit mercy',fx:[{utPerfect:.1},{utPerfect:.25}],txt:['PERFECT 범위 +10%','PERFECT 범위 +25%']},
-결투가:{ids:'blunt excite smash echo finish inferno dual overload hextech',fx:[{atkDrive:.05,atkBh:.05},{atkDrive:.12,atkBh:.12}],txt:['포·백 드라이브 +5%','포·백 드라이브 +12%']},
-비전술사:{ids:'axiom final brainy boomer mystic erode missile',fx:[{atkCharge:.25},{atkCharge:.6}],txt:['필살기 충전 +25%','필살기 충전 +60%']},
-수호자:{ids:'reach spin wall goliath touch loop mind shield legday grit',fx:[{defSafe:.03},{defSafe:.07}],txt:['내 타구 성공률 +3%','내 타구 성공률 +7%']},
-싸움꾼:{ids:'aid escape brain glass pact mosh stalk ocean nature',fx:[{defKey:.1,defClutch:.1},{defKey:.25,defClutch:.25}],txt:['실점 직후·위기 성공률 +10%','실점 직후·위기 성공률 +25%']},
-포춘:{ids:'donate luck mad gotime overflow home pandora omni',fx:[{utLuck:.03},{utLuck:.07}],txt:['엣지 행운 +3%','엣지 행운 +7%']},
+const SYN={'정밀 탁구부':{ids:'deft rhythm double light help jewel crit mercy',fx:[{utPerfect:.1},{utPerfect:.25}],txt:['PERFECT 범위 +10%','PERFECT 범위 +25%']},
+'드라이브 연합':{ids:'blunt excite smash echo finish inferno dual overload hextech',fx:[{atkDrive:.05,atkBh:.05},{atkDrive:.12,atkBh:.12}],txt:['포·백 드라이브 +5%','포·백 드라이브 +12%']},
+'필살기 연구회':{ids:'axiom final brainy boomer mystic erode missile',fx:[{atkCharge:.25},{atkCharge:.6}],txt:['필살기 충전 +25%','필살기 충전 +60%']},
+'수비 장인단':{ids:'reach spin wall goliath touch loop mind shield legday grit',fx:[{defSafe:.03},{defSafe:.07}],txt:['내 타구 성공률 +3%','내 타구 성공률 +7%']},
+'근성 랠리단':{ids:'aid escape brain glass pact mosh stalk ocean nature',fx:[{defKey:.1,defClutch:.1},{defKey:.25,defClutch:.25}],txt:['실점 직후·위기 성공률 +10%','실점 직후·위기 성공률 +25%']},
+'스핀코인 클럽':{ids:'donate luck mad gotime overflow home pandora omni',fx:[{utLuck:.03},{utLuck:.07}],txt:['엣지 행운 +3%','엣지 행운 +7%']},
 '눈오는 날':{ids:'snowball snowman blizzard avalanche iceage ice',fx:[{defSlow:.04},{defSlow:.1}],txt:['상대 공 속도 -4%','상대 공 속도 -10%']}},SYN_AT=[3,5];
 // 눈덩이: 돌파한 스테이지만큼 굴러서 커진다 (synFx에서 계산). 눈사태는 눈덩이 효과 2배.
 AUGS.push(['snowball','실버','눈덩이','돌파한 스테이지마다 포·백 드라이브 +1% (최대 +20%)',{}],['snowman','실버','눈사람 수비','타격 범위 +12% · 상대 공 속도 -3%',{defReach:.12,defSlow:.03}],['blizzard','골드','눈보라 서브','상대 회전 실수 -30% · 상대 리턴 -4%',{defSpin:.3,atkPress:.04}],['avalanche','골드','눈사태 스매시','눈덩이 효과 2배 · 스매시 +15%',{atkSmash:.15}],['iceage','프리즘','빙하기 탁구대','날아오는 상대 공 속도 -12% · 블록 +15%',{defSlow:.12,defBlock:.15}]);
