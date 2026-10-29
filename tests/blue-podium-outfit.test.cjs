@@ -4,6 +4,6 @@ assert.match(html,/\['blue_podium','블루 포디움 폴로'/);
 assert.match(html,/\['blue_podium','블루 포디움 쇼츠'/);
 assert.match(html,/\{id:'blue_podium',name:'블루 포디움 폴로'/);
 assert.match(html,/blue_podium:\{tier:'extreme'\}/);
-assert.match(html,/\['ref_garden','ref_pixel','ref_moon','ref_neo','ref_coral','blue_podium'\]/);
+assert.match(html,/\['ref_garden','ref_pixel','ref_moon','ref_neo','ref_coral','blue_podium','league_black','league_blue','league_purple','league_red','league_pink'\]/);
 assert.doesNotMatch(html,/CORNILLEAU/);
 console.log('Blue Podium outfit is an original, unlockable in-game set');

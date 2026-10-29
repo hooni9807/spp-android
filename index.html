@@ -1102,7 +1102,12 @@ FIT_TOPS.push(
  ['ref_moon','문라이트 아키비스트 코트',{shirt:'#252946',sleeve:'#252946',collar:'#f5ead8',longSleeve:true,pat:{k:'ref_moon',a:'#d7b36a',b:'#5a3154'}},{lv:30}],
  ['ref_neo','네오 스트리트 라이더 재킷',{shirt:'#1d54cf',sleeve:'#1d54cf',collar:'#111825',longSleeve:true,pat:{k:'ref_neo',a:'#e9eff8',b:'#151a23'}},{tier:'ultra'}],
  ['ref_coral','코랄 코스트 셔츠',{shirt:'#ef7465',sleeve:'#ef7465',collar:'#fff3dc',pat:{k:'ref_coral',a:'#fff3dc',b:'#53cfc1'}},{lv:10}],
- ['blue_podium','블루 포디움 폴로',{shirt:'#1765b7',sleeve:'#17304a',collar:'#f7fbff',pat:{k:'blue_podium',a:'#f7fbff',b:'#101d2c'}},{tier:'extreme'}]
+ ['blue_podium','블루 포디움 폴로',{shirt:'#1765b7',sleeve:'#17304a',collar:'#f7fbff',pat:{k:'blue_podium',a:'#f7fbff',b:'#101d2c'}},{tier:'extreme'}],
+ ['league_black','리그 콘테스트 블랙',{shirt:'#171a20',sleeve:'#171a20',collar:'#f7fbff',pat:{k:'league_polo',a:'#f7fbff',b:'#3a4452'}},{tour:'cornilleau_league'}],
+ ['league_blue','리그 콘테스트 블루',{shirt:'#1765b7',sleeve:'#1765b7',collar:'#f7fbff',pat:{k:'league_polo',a:'#f7fbff',b:'#101d2c'}},{tour:'cornilleau_league'}],
+ ['league_purple','리그 콘테스트 퍼플',{shirt:'#6f3bb2',sleeve:'#6f3bb2',collar:'#f7fbff',pat:{k:'league_polo',a:'#f7fbff',b:'#21152f'}},{tour:'cornilleau_league'}],
+ ['league_red','리그 콘테스트 레드',{shirt:'#d4474b',sleeve:'#d4474b',collar:'#f7fbff',pat:{k:'league_polo',a:'#f7fbff',b:'#201d26'}},{tour:'cornilleau_league'}],
+ ['league_pink','리그 콘테스트 핑크',{shirt:'#e95a95',sleeve:'#e95a95',collar:'#fff8fb',pat:{k:'league_polo',a:'#fff8fb',b:'#332033'}},{tour:'cornilleau_league'}]
 );
 FIT_BOTS.push(
  ['studio_club','포레스트 플리츠',{pants:'#244f42',shorts:true,shortsLen:.04,skirt:'pleat',skirtC:'#244f42',skirtTrim:'#f2eddb',socks:true}],
@@ -1136,7 +1141,12 @@ FIT_BOTS.push(
  ['ref_moon','플럼 아카이브 팬츠',{pants:'#5a3154',shorts:false,pstripe:'#d7b36a'}],
  ['ref_neo','리플렉트 카고 팬츠',{pants:'#20242d',shorts:false,pstripe:'#e9eff8',legx:'cargo'}],
  ['ref_coral','샌드 카고 쇼츠',{pants:'#ead7af',shorts:true,shortsLen:.62,pstripe:'#53cfc1'}],
- ['blue_podium','블루 포디움 쇼츠',{pants:'#101d2c',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}]
+ ['blue_podium','블루 포디움 쇼츠',{pants:'#101d2c',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}],
+ ['league_black','리그 블랙 쇼츠',{pants:'#171a20',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}],
+ ['league_blue','리그 블루 쇼츠',{pants:'#101d2c',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}],
+ ['league_purple','리그 퍼플 쇼츠',{pants:'#21152f',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}],
+ ['league_red','리그 레드 쇼츠',{pants:'#201d26',shorts:true,shortsLen:.62,pstripe:'#f7fbff',socks:true}],
+ ['league_pink','리그 핑크 쇼츠',{pants:'#332033',shorts:true,shortsLen:.62,pstripe:'#fff8fb',socks:true}]
 );
 FIT_ACC.push(
  ['studio_club','클럽 선바이저','head','',{hat:'studio_club',hatC:'#f2eddb'}],
@@ -1150,7 +1160,7 @@ FIT_ACC.push(
 const FIT_SLOTS=['head','arm','body','wing','aura','pet'];
 FIT_TOPS.push(...VET_TOP);FIT_BOTS.push(...VET_BOT);FIT_ACC.push(...VET_HEAD,...VET_ARM,...VET_BODY);
 const fitOk=r=>!r||(!r.lv||progLevel()>=r.lv)&&(!r.tier||!!tS()[r.tier])&&(!r.bosses||['minhee','maou','sejong','godyung'].every(k=>tS()[k]))&&(!r.boss||!!tS()[r.boss])&&(!r.survival||!!tS().survival)&&(!r.tour||trophyIds().includes(r.tour))&&(!r.online||(tS().online||0)>=r.online)&&(!r.attendance||(+prog.q?.attendance||0)>=r.attendance);
-const fitReqText=r=>[r.lv?`Lv${r.lv}`:'',r.tier?({hard:'하드 이상 승리',extreme:'익스트림 이상 승리',ultra:'울트라 이상 승리',uhard:'울트라 하드 이상 승리',uext:'울트라 익스트림 승리'}[r.tier]||''):'',r.bosses?'모든 보스전 승리':'',r.boss?(({minhee:'민희쌤',maou:'탁구 마왕',sejong:'세종 9부 아줌마',godyung:'사기부수 갓융자'}[r.boss]||'보스')+' 격파'):'',r.survival?'생존 랠리 60초 성공':'',r.tour?`${TOUR_REWARDS.find(x=>x.id===r.tour)?.name||'대회'} 우승`:'',r.online?`${r.online}승`:'',r.attendance?`${r.attendance}일 출석 보상`:''].filter(Boolean).join(' · ');
+const fitReqText=r=>[r.lv?`Lv${r.lv}`:'',r.tier?({hard:'하드 이상 승리',extreme:'익스트림 이상 승리',ultra:'울트라 이상 승리',uhard:'울트라 하드 이상 승리',uext:'울트라 익스트림 승리'}[r.tier]||''):'',r.bosses?'모든 보스전 승리':'',r.boss?(({minhee:'민희쌤',maou:'탁구 마왕',sejong:'세종 9부 아줌마',godyung:'사기부수 갓융자'}[r.boss]||'보스')+' 격파'):'',r.survival?'생존 랠리 60초 성공':'',r.tour?`${TOUR_REWARDS.find(x=>x.id===r.tour)?.name||({cornilleau_league:'코닐리우 리그전'}[r.tour]||'대회')} 우승`:'',r.online?`${r.online}승`:'',r.attendance?`${r.attendance}일 출석 보상`:''].filter(Boolean).join(' · ');
 const fitClean=(f,gate=false)=>{const o={top:'def',bot:'def'};if(f&&typeof f==='object'){const t=FIT_TOPS.find(t=>t[0]===f.top),b=FIT_BOTS.find(t=>t[0]===f.bot);if(t&&(!gate||fitOk(t[3])))o.top=f.top;if(b&&(!gate||fitOk(b[3])))o.bot=f.bot;for(const k of FIT_SLOTS){const a=FIT_ACC.find(x=>x[0]===f[k]&&x[2]===k);if(a&&(!gate||fitOk(a[5])))o[k]=a[0];}}return o;};
 let fitAnim=0,myFit=fitClean((()=>{try{return JSON.parse(localStorage.getItem('fit'));}catch{return null;}})(),true),fitDraft=null,fitSkinDraft='',fitTab='top';
 function withFit(look,f){if(!f||!look)return look;f=fitClean(f);let L=look;const t=FIT_TOPS.find(x=>x[0]===f.top),b=FIT_BOTS.find(x=>x[0]===f.bot);
@@ -1185,12 +1195,17 @@ FIT_COLLECTIONS.push(
  {id:'ref_neo',name:'네오 스트리트 라이더',label:'NEO RIDER',desc:'코발트 봄버와 리플렉트 카고의 스피드 레이어드 룩.',colors:['#1d54cf','#e9eff8','#151a23'],fit:{top:'ref_neo',bot:'ref_neo',head:'capb',arm:'watch'}},
  {id:'ref_coral',name:'코랄 코스트 데이',label:'CORAL COAST',desc:'코랄 플라워 셔츠와 샌드 카고 쇼츠로 만든 휴양지 코트 룩.',colors:['#ef7465','#fff3dc','#53cfc1'],fit:{top:'ref_coral',bot:'ref_coral',head:'studio_club',arm:'rainbow'}},
  {id:'blue_podium',name:'블루 포디움 폴로',label:'BLUE PODIUM',desc:'로열 블루 바탕에 딥 차콜 숄더 패널과 화이트 플랫 칼라를 더한 경기용 폴로 세트.',colors:['#1765b7','#101d2c','#f7fbff'],fit:{top:'blue_podium',bot:'blue_podium',head:'hb',arm:'wb'}},
+ {id:'league_black',name:'리그 콘테스트 블랙',label:'LEAGUE BLACK',desc:'매트 블랙 위에 실버 화이트 칼라와 사선 스트라이프를 더한 리그 폴로 세트.',colors:['#171a20','#3a4452','#f7fbff'],fit:{top:'league_black',bot:'league_black',head:'hb',arm:'wb'}},
+ {id:'league_blue',name:'리그 콘테스트 블루',label:'LEAGUE BLUE',desc:'코발트 블루와 딥 네이비 패널의 빠르고 선명한 리그 폴로 세트.',colors:['#1765b7','#101d2c','#f7fbff'],fit:{top:'league_blue',bot:'league_blue',head:'hb',arm:'wb'}},
+ {id:'league_purple',name:'리그 콘테스트 퍼플',label:'LEAGUE PURPLE',desc:'로열 퍼플과 잉크 블랙 패널, 화이트 칼라로 대비를 살린 리그 폴로 세트.',colors:['#6f3bb2','#21152f','#f7fbff'],fit:{top:'league_purple',bot:'league_purple',head:'hb',arm:'wb'}},
+ {id:'league_red',name:'리그 콘테스트 레드',label:'LEAGUE RED',desc:'선명한 레드 바탕과 블랙 숄더, 대각 화이트 라인이 돋보이는 리그 폴로 세트.',colors:['#d4474b','#201d26','#f7fbff'],fit:{top:'league_red',bot:'league_red',head:'hb',arm:'wb'}},
+ {id:'league_pink',name:'리그 콘테스트 핑크',label:'LEAGUE PINK',desc:'라즈베리 핑크와 딥 플럼 패널에 부드러운 화이트 칼라를 더한 리그 폴로 세트.',colors:['#e95a95','#332033','#fff8fb'],fit:{top:'league_pink',bot:'league_pink',head:'hb',arm:'wb'}},
  {id:'vet_solo',group:'veteran',name:'혼자서도 충분해',label:'SOLO LEGEND',desc:'Lv 30의 노련함으로 입는 토기 모자와 낡은 수련복. 장비는 가볍게, 랠리는 끝까지.',colors:['#c17e50','#eee2c7','#806950'],req:VET_REQ.solo,fit:{top:'vet_solo',bot:'vet_solo',head:'vet_solo',arm:'vet_wraps'}},
  {id:'vet_sauna',group:'veteran',name:'사우나에서 온 고수',label:'OLD SCHOOL',desc:'울트라 하드 이상을 정복한 선수의 파란 가운, 삿갓, 해진 망토.',colors:['#76b5d4','#cfa665','#816378'],req:VET_REQ.sauna,fit:{top:'vet_sauna',bot:'vet_sauna',head:'vet_sauna',arm:'vet_workgloves',body:'vet_ragcape'}},
  {id:'vet_giant',group:'veteran',name:'전설은 녹슬지 않아',label:'BRASS LEGEND',desc:'모든 보스를 쓰러뜨린 증표. 흠집 난 황동 갑옷과 초록 방패의 묵직한 존재감.',colors:['#b79556','#4a6655','#514636'],req:VET_REQ.giant,fit:{top:'vet_giant',bot:'vet_giant',head:'vet_giant',body:'vet_grassshield'}},
  {id:'vet_party',group:'veteran',name:'만렙의 종이 왕관',label:'PARTY VETERAN',desc:'온라인 10승으로 증명한 고수의 보라 왕관과 금테 망토.',colors:['#b291d8','#254e50','#d9ba71'],req:VET_REQ.party,fit:{top:'vet_party',bot:'vet_party',head:'vet_party',body:'vet_mastercape'}}
 );
-const TODAY_FIT_REQ={studio_club:{lv:5},studio_cloud:{lv:8},studio_arcade:{lv:12},studio_rose:{lv:15},studio_midnight:{lv:20},studio_varsity:{lv:25},night_runner:{lv:5},sunset_court:{lv:8},checkmate:{lv:12},orchid_shell:{lv:15},lux_tweed:{lv:18},lux_trench:{lv:20},lux_leather:{tier:'hard'},lux_weave:{lv:25},lux_yacht:{tier:'ultra'},lux_opera:{lv:30},lux_silk:{tier:'uhard'},lux_alpine:{bosses:true},lux_tailor:{online:10},lux_garden:{tier:'uext'},ref_garden:{lv:22},ref_pixel:{tier:'hard'},ref_moon:{lv:30},ref_neo:{tier:'ultra'},ref_coral:{lv:10},blue_podium:{tier:'extreme'},aero_lime:{tier:'hard'},coral_dash:{tier:'extreme'},glacier_net:{survival:true},ink_arrow:{tier:'ultra'},violet_clear:{boss:'minhee'},sunrise_drop:{tour:'daejeon'},mint_rally:{tier:'uhard'},crimson_drive:{boss:'maou'},silver_shuttle:{tour:'sejong'},cobalt_jump:{tier:'uext'},peach_net:{tour:'busan'},forest_lift:{tour:'seoul'}};
+const TODAY_FIT_REQ={studio_club:{lv:5},studio_cloud:{lv:8},studio_arcade:{lv:12},studio_rose:{lv:15},studio_midnight:{lv:20},studio_varsity:{lv:25},night_runner:{lv:5},sunset_court:{lv:8},checkmate:{lv:12},orchid_shell:{lv:15},lux_tweed:{lv:18},lux_trench:{lv:20},lux_leather:{tier:'hard'},lux_weave:{lv:25},lux_yacht:{tier:'ultra'},lux_opera:{lv:30},lux_silk:{tier:'uhard'},lux_alpine:{bosses:true},lux_tailor:{online:10},lux_garden:{tier:'uext'},ref_garden:{lv:22},ref_pixel:{tier:'hard'},ref_moon:{lv:30},ref_neo:{tier:'ultra'},ref_coral:{lv:10},blue_podium:{tier:'extreme'},league_black:{tour:'cornilleau_league'},league_blue:{tour:'cornilleau_league'},league_purple:{tour:'cornilleau_league'},league_red:{tour:'cornilleau_league'},league_pink:{tour:'cornilleau_league'},aero_lime:{tier:'hard'},coral_dash:{tier:'extreme'},glacier_net:{survival:true},ink_arrow:{tier:'ultra'},violet_clear:{boss:'minhee'},sunrise_drop:{tour:'daejeon'},mint_rally:{tier:'uhard'},crimson_drive:{boss:'maou'},silver_shuttle:{tour:'sejong'},cobalt_jump:{tier:'uext'},peach_net:{tour:'busan'},forest_lift:{tour:'seoul'}};
 const applyTodayFitRequirements=()=>{for(const [id,req] of Object.entries(TODAY_FIT_REQ)){for(const [items,ri] of [[FIT_TOPS,3],[FIT_BOTS,3],[FIT_ACC,5]]){const item=items.find(x=>x[0]===id);if(item)item[ri]=req;}for(const set of FIT_COLLECTIONS)if(set.id===id||set.fit.top===id||set.fit.bot===id)set.req=req;}};applyTodayFitRequirements();
 const FIT_LABELS={collection:'스튜디오 컬렉션',veteran:'고인물 아카이브',top:'상의',bot:'하의',head:'머리',arm:'손목',body:'목 · 몸',wing:'날개',aura:'이펙트',pet:'펫',skin:'라켓 스킨'};
 let fitBack=false;
@@ -2075,9 +2090,10 @@ function referenceTorso(look,ux,top,th,s,isBack,at,q){
  else if(q.k==='ref_neo'){fill(-18,0,36,64,'#151a23');poly([[-18,2],[-4,0],[-2,39],[-17,42]],'#1d54cf');poly([[18,2],[4,0],[2,39],[17,42]],'#1d54cf');line([-15,3],[-7,39],q.a,2);line([15,3],[7,39],q.a,2);fill(-11,21,22,13,'#111720',3);line([-12,18],[10,35],q.a,2);fill(-3,25,7,4,'#1d54cf',1);for(const x of [-13,11])fill(x,44,8,10,'#151a23',1);}
  else if(q.k==='ref_coral'){fill(-18,0,36,64,'#fff3dc');poly([[-18,2],[-6,0],[-1,63],[-17,58]],'#ef7465');poly([[18,2],[6,0],[1,63],[17,58]],'#ef7465');for(const [x,y] of [[-11,17],[10,20],[-7,35],[10,45],[-12,51]]){ctx.fillStyle=q.a;for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(x+Math.cos(i*1.256)*2.6,y+Math.sin(i*1.256)*2.6,1.7,0,Math.PI*2);ctx.fill();}ctx.fillStyle=q.b;ctx.beginPath();ctx.arc(x,y,1.6,0,Math.PI*2);ctx.fill();}for(const y of [21,34,47]){ctx.fillStyle='#bd593e';ctx.beginPath();ctx.arc(-2,y,1.6,0,Math.PI*2);ctx.fill();}}
  else if(q.k==='blue_podium'){fill(-18,0,36,64,'#1765b7');poly([[-18,0],[-4,0],[-7,22],[-18,29]],'#101d2c');poly([[18,0],[4,0],[7,22],[18,29]],'#101d2c');poly([[-7,0],[0,11],[7,0],[5,7],[0,5],[-5,7]],'#f7fbff');line([-17,25],[-7,18],q.a,1.5);line([17,25],[7,18],q.a,1.5);line([-13,10],[-8,58],'#f7fbff88',.8);line([13,10],[8,58],'#f7fbff88',.8);fill(-4,31,8,5,'#f7fbff',1);ctx.fillStyle='#1765b7';ctx.font='bold 4px sans-serif';ctx.textAlign='center';ctx.fillText('SPP',0,35);}
+ else if(q.k==='league_polo'){fill(-18,0,36,64,look.shirt);poly([[-18,0],[-4,0],[-7,21],[-18,28]],q.b);poly([[18,0],[4,0],[7,21],[18,28]],q.b);poly([[-7,0],[0,11],[7,0],[5,7],[0,5],[-5,7]],q.a);poly([[-18,42],[-3,18],[4,18],[-13,49]],q.a);line([-17,45],[-4,22],q.b,2);line([-14,10],[-8,58],q.a+'88',.8);line([14,10],[8,58],q.a+'88',.8);for(const y of [30,40,50])line([-3,y],[3,y],q.a,.7);}
  if(isBack)line([-13,22],[13,22],q.a,1);
 }
-for(const id of ['ref_garden','ref_pixel','ref_moon','ref_neo','ref_coral','blue_podium'])FIT_EXT.top[id]=referenceTorso;
+for(const id of ['ref_garden','ref_pixel','ref_moon','ref_neo','ref_coral','blue_podium','league_black','league_blue','league_purple','league_red','league_pink'])FIT_EXT.top[id]=referenceTorso;
 function studioHead(look,hx,hd,s,ph,isBack,at,{ht,hw,fh}){
  const seat=look.hat==='studio_arcade'?ht:fh-5*s;
  ctx.translate(hx,seat);ctx.scale(s,s);const w=hw/s,c=look.hatC;
