@@ -13,6 +13,10 @@ rep("const d=Math.min(devicePixelRatio||1,2);canvas.width=W*d","const d=renderPi
 rep("function arenaBg(){const d=Math.min(devicePixelRatio||1,2);","function arenaBg(){const d=renderPixelRatio();")
 # 느린 프레임에서 물리를 한 번에 많이 돌리면 공이 순간이동한다. 저사양은 한 프레임에 최대 2스텝(1/30초)만 진행해, 순간이동 대신 잠깐 느려지게 한다. 온라인은 시간 동기화 때문에 그대로.
 rep("Math.min((t-last)/1000||0,.1)","Math.min((t-last)/1000||0,ANDROID_LOW_SPEC&&!net?1/30:.1)")
+# 120Hz 폰에서 프레임을 두 배로 그리지 않게 60fps로 묶는다.
+rep("function frame(t){try{","var lowSpecFrameAt=0;function frame(t){if(ANDROID_LOW_SPEC&&t-lowSpecFrameAt<15.5){requestAnimationFrame(frame);return;}lowSpecFrameAt=t;try{")
+# 옷 원단 무늬·음영(매 프레임 패턴·그라디언트 생성)은 저사양에서 생략한다.
+rep("function fitTailoring(look,ux,top,th,s){","function fitTailoring(look,ux,top,th,s){if(ANDROID_LOW_SPEC)return;")
 # low-spec CSS: no decorative looping animations, no backdrop blur, no big glows
 rep("</head>","<style>html.low-spec .aug-mode-btn,html.low-spec #boss-pick [data-villain],html.low-spec #gacha-open,html.low-spec .aug-card{animation:none!important;transition:none!important}html.low-spec dialog::backdrop{backdrop-filter:none!important}html.low-spec #syn-hud div{box-shadow:none}</style>\n</head>")
 open(p,'w',encoding='utf-8').write(s)
