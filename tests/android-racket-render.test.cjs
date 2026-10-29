@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const html=fs.readFileSync('index.html','utf8');
+const rackets=html.slice(html.indexOf('const RACKETS='),html.indexOf('// Character looks.'));
+const drawing=html.slice(html.indexOf('function bladePath('),html.indexOf('// The hand on the racket,'));
+let depth=0,fills=0;
+const ctx=new Proxy({save(){depth++;},restore(){depth--;},fill(){fills++;},createLinearGradient(){return {addColorStop(){}};}},{get(o,k){return o[k]||(()=>{});}});
+const sandbox={ctx,Path2D:class{constructor(){return new Proxy(this,{get:()=>()=>{}});}},enhanceFxTier:()=>0,enhanceCombatLevel:()=>30,equippedSkin:()=>null};
+vm.createContext(sandbox);
+vm.runInContext(rackets+drawing+";for(const type of Object.keys(RACKETS))racket(100,100,0,type,RED,1,null,true);",sandbox);
+assert.equal(depth,0,'Every racket must restore the canvas transform');
+assert.ok(fills>=8,'Enhanced Android rackets must draw blade and handle');
+console.log('All enhanced Android racket types render without errors or leaked transforms');
