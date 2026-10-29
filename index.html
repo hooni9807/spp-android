@@ -406,7 +406,7 @@ const $=id=>document.getElementById(id),canvas=$('court'),P=PingPhysics;
 let ctx=canvas.getContext('2d');
 let hudFrameAt=0;
 const ANDROID_LOW_SPEC=window.Capacitor?.getPlatform?.()==='android';
-const renderPixelRatio=()=>ANDROID_LOW_SPEC?.75:Math.min(devicePixelRatio||1,2);
+const renderPixelRatio=()=>ANDROID_LOW_SPEC?1:Math.min(devicePixelRatio||1,2);
 if(ANDROID_LOW_SPEC)document.documentElement.classList.add('low-spec');
 /* 캔버스 그림자 흐림(shadowBlur)은 안드로이드 WebView에서 가장 무거운 그리기라 저사양에서는 끈다. *//* 매 프레임 같은 글자를 다시 써서 생기는 레이아웃·다시 그리기를 막는다: 값이 같으면 쓰지 않는다. */if(ANDROID_LOW_SPEC){for(const [o,k] of [[Node.prototype,'textContent'],[Element.prototype,'innerHTML']]){const d=Object.getOwnPropertyDescriptor(o,k);Object.defineProperty(o,k,{configurable:true,get(){return d.get.call(this);},set(v){if(this.nodeType===1&&this.childElementCount<=8&&d.get.call(this)===String(v))return;d.set.call(this,v);}});}}if(ANDROID_LOW_SPEC){const sb=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'shadowBlur');Object.defineProperty(CanvasRenderingContext2D.prototype,'shadowBlur',{configurable:true,get(){return 0;},set(){sb.set.call(this,0);}});}
 const myName=()=>String(store.get('nick')||googleUser?.displayName||'선수').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12)||'선수';
@@ -2023,7 +2023,7 @@ function photoFrame(look,key,s,hx,hd){
  // Anchor edited cutouts at the chin so the animated neck joins the jaw once.
  return {im,x:hx-hw*(fit?.cx??.5),y:fit?hd+fit.b*s-hh:hd-9*s-hh/2,w:hw,h:hh};
 }
-function headPhoto(look,st,key,s,hx,hd){const draw=(k,al)=>{const f=photoFrame(look,k,s,hx,hd);if(!f)return;ctx.save();ctx.globalAlpha*=al;ctx.drawImage(f.im,f.x,f.y,f.w,f.h);ctx.restore();};
+function headPhoto(look,st,key,s,hx,hd){const draw=(k,al)=>{const f=photoFrame(look,k,s,hx,hd);if(!f)return;ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.globalAlpha*=al;ctx.drawImage(f.im,f.x,f.y,f.w,f.h);ctx.restore();};
 if(st.fk===undefined){st.fk=key;st.ft=time-.12;}if(st.fk!==key){st.fp=st.fk;st.fk=key;st.ft=time;}draw(key,1);}
 function headWearFrame(look,key,s,hx,hd){
  const f=photoFrame(look,key,s,hx,hd);if(!f)return {x:hx,top:hd-(look.tousled?17:14)*s,band:hd-7*s,half:(look.bob?15:13.5)*s};
