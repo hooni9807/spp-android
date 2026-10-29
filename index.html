@@ -3576,12 +3576,14 @@ AUGS=[['blunt','실버','묵직한 포핸드','포핸드 드라이브 속도 +12
 ['nature','프리즘','자연 치유 휴식','목숨 +1 · 실점 직후 다음 랠리 성공률 +15% · 내 타구 성공률 +5%',{defKey:.15,defSafe:.05},r=>r.lives++]];
 function augRandom(r,tier,n){const pool=AUGS.filter(a=>a[1]===tier&&!a[5]&&!r.augs.includes(a[0])).sort(()=>Math.random()-.5).slice(0,n);for(const a of pool)for(const [k,v] of Object.entries(a[4]))r.fx[k]=(r.fx[k]||0)+v;toast(`${pool.map(a=>a[2]).join(' · ')} 효과를 얻었어요`,2.2);}
 let stageRun=null,stageStarting=false;
+// AI 공 속도·회전 강화: 스테이지마다 +5%, 13스테이지(+60%)에서 멈춘다. 그 뒤로는 AI 증강으로만 어려워진다.
+const stageBoost=n=>Math.min(.6,(n-1)*.05);
 {const t0=titleFx;titleFx=k=>t0(k)+(stageRun?.live&&mode==='match'?(stageRun.fx[k]||0)+synFx(k):0);}
-function stageGame(){const r=stageRun;if(!r)return;const at=stageAt(r.stage);aiTier=at.tier;const pool=Object.keys(LOOKS).filter(k=>characterAvailable(k)&&!LOOKS[k].boss&&!BOSS_LABEL[k]&&!VILLAINS.includes(k)&&k!==charType);setMode('match');stageStarting=true;begin(pool[Math.random()*pool.length|0]);stageStarting=false;aiCharge=Math.min(100,(r.stage-1)*12);stageAiAugs(r);stageSave();if(r.lead){you=Math.min(4,r.lead);updateScore();}$('cpu-name').textContent=`스테이지 ${r.stage} · 목숨 ${r.lives}${r.aiAugs?.length?` · AI 증강 ${r.aiAugs.length}`:''}`;toast(`스테이지 ${r.stage} · ${TIERS[aiTier].name} ${at.no}/${at.of} · 5점 내기 · AI 공속·회전 +${(r.stage-1)*5}%`,2.2);}
+function stageGame(){const r=stageRun;if(!r)return;const at=stageAt(r.stage);aiTier=at.tier;const pool=Object.keys(LOOKS).filter(k=>characterAvailable(k)&&!LOOKS[k].boss&&!BOSS_LABEL[k]&&!VILLAINS.includes(k)&&k!==charType);setMode('match');stageStarting=true;begin(pool[Math.random()*pool.length|0]);stageStarting=false;aiCharge=Math.min(100,(r.stage-1)*12);stageAiAugs(r);stageSave();if(r.lead){you=Math.min(4,r.lead);updateScore();}$('cpu-name').textContent=`스테이지 ${r.stage} · 목숨 ${r.lives}${r.aiAugs?.length?` · AI 증강 ${r.aiAugs.length}`:''}`;toast(`스테이지 ${r.stage} · ${TIERS[aiTier].name} ${at.no}/${at.of} · 5점 내기 · AI 공속·회전 +${Math.round(stageBoost(r.stage)*100)}%`,2.2);}
 function stageStart(){if(playing&&(you||cpu)&&!confirm('진행 중인 점수가 초기화됩니다. 증강 탁구를 시작할까요?'))return;const pk=augPerks();stageRun={stage:1,lives:3+(pk.aug25?1:0),lead:0,cleared:0,augOwed:1,fx:{},augs:[],perks:pk,live:true};stageUi();openAugPick();}
 const stageOn=()=>stageRun?.live&&mode==='match'&&!net;
 {const b0=begin;begin=function(...a){if(!stageStarting&&stageRun?.live)stageRun=null;return b0.apply(this,a);};}
-{const a0=P.aiReturn;P.aiReturn=(kind,x,y,z,speed,aimX,spinK=1,...rest)=>{if(stageOn()){const k=1+(stageRun.stage-1)*.05;speed*=k;spinK*=k;}return a0(kind,x,y,z,speed,aimX,spinK,...rest);};}
+{const a0=P.aiReturn;P.aiReturn=(kind,x,y,z,speed,aimX,spinK=1,...rest)=>{if(stageOn()){const k=1+stageBoost(stageRun.stage);speed*=k;spinK*=k;}return a0(kind,x,y,z,speed,aimX,spinK,...rest);};}
 // 이미 고른 증강·같은 판에 나온 카드는 제외. 목숨을 깎는 증강(유리 대포·불길한 계약)은 목숨 증강(바다의 영혼·자연 치유)을 가진 뒤에만.
 // 이미 가진 시너지의 증강이 나올 확률 +20%.
 function augRoll(r,not=[]){const w=r.stage<3?[.7,.27,.03]:r.stage<6?[.45,.4,.15]:[.25,.45,.3],x=Math.random(),tier=x<w[0]?'실버':x<w[0]+w[1]?'골드':'프리즘',
