@@ -1,0 +1,33 @@
+name: Low-spec debug APK
+
+# 서명 키 없이 만드는 저사양 테스트용 APK. main에 푸시할 때마다 android-low-spec-debug 릴리스의 app-debug.apk를 교체한다.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
+      - run: npm ci
+      - run: npm run android:apk
+      - name: Replace release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload android-low-spec-debug android/app/build/outputs/apk/debug/app-debug.apk --clobber
