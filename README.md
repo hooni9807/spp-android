@@ -22,6 +22,10 @@
 
 앱의 Google/Firebase 로그인에는 Firebase Authentication의 승인된 도메인에 `localhost`를 추가해야 합니다. Play Store 배포는 별도 서명 키와 release AAB 빌드가 필요합니다.
 
+## 저사양 앱 버전 동기화
+
+이 저장소는 웹판 [spp](https://github.com/hooni9807/spp)의 핸드폰 앱용 저사양 버전입니다. `scripts/sync-from-spp.sh ../spp`로 웹판 최신 파일을 가져온 뒤 저사양 패치(화면 배율 1 · 강화 이펙트/필살기 연출/화면 흔들림 끔 · 장식 애니메이션과 배경 흐림 끔)를 적용하고, 얼굴 사진(최대 384px)과 assets 이미지(최대 512px)를 줄입니다.
+
 ## 📚 문서
 
 | 문서 | 내용 |
