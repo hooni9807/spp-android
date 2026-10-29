@@ -402,6 +402,8 @@ root.PingPhysics={shortLeft,EQUIP,back,retreatAt,incomingRetreat,OFF_T,DEEP_M,DE
 'use strict';
 const $=id=>document.getElementById(id),canvas=$('court'),P=PingPhysics;
 let ctx=canvas.getContext('2d');
+const ANDROID_LOW_SPEC=window.Capacitor?.getPlatform?.()==='android';
+const renderPixelRatio=()=>ANDROID_LOW_SPEC?1:Math.min(devicePixelRatio||1,2);
 const myName=()=>String(store.get('nick')||googleUser?.displayName||'선수').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12)||'선수';
 let googleUser=null,deep=0,deepS=0,pops=[],net=null,difficulty='b4',matchBest=0,driveBonus=0,dualSuccess=0,lastReason='',W=900,H=465,mode='match',playing=false,paused=false,ball=null,wait=0,you=0,cpu=0,rally=0,best=0,last=0,time=0,down=false,trail=[],fx=[],sound=false,audio=null,paddle={x:450,y:380,vx:0,vy:0},samples=[],lastHit=-10,lastAIHit=-10,toastUntil=0,gesture=null,activePointer=null,lastTap=null,smashUntil=-1,charge=0,touchInput=false,swingMemory=null,racketType='shake',playerSide=1,renderFaultUntil=0;
 const names={loop:['LOOP DRIVE','루프 드라이브 · 높은 전진 회전'],back:['BACK DRIVE','백드라이브 · 빠른 전진 회전'],chiquita:['CHIQUITA','필살기 · 치키타 (강한 백드라이브)'],lightning:['LIGHTNING','필살기 · 번개 속공'],thunder:['THUNDER','필살기 · 천둥 스매시'],phantom:['PHANTOM','필살기 · 유령 커트'],crescent:['CRESCENT','필살기 · 초승달 드라이브'],drive:['DRIVE','드라이브 · 전진 회전'],cut:['CUT','커트 · 후진 회전'],chop:['CHOP','수비 커트 · 강한 후진 회전'],short:['SHORT','쇼트 · 짧은 밀어치기'],block:['BLOCK','디펜스 쇼트 · 각도를 숙여 막기'],smash:['SMASH','스매시 · 강한 공격'],side:['SIDE SPIN','사이드스핀 · 휘어지는 궤적'],serve:['SERVE','서브']};
@@ -520,7 +522,7 @@ const enhanceLevel=()=>Math.min(MAX_ENHANCE,Math.max(0,Math.floor(Number(prog.ra
 const TOUR_REWARDS=[{id:'daejeon',name:'대전시대회',trophy:'🥖',skin:'champion',skinName:'우승의 라켓',rarity:'희귀',colors:['#fff0a4','#ba7920','#6b3e12']},{id:'sejong',name:'세종시대회',trophy:'🌸',skin:'sejong',skinName:'연화 수호 라켓',rarity:'영웅',colors:['#ffe6f2','#df5b9b','#7b295e']},{id:'busan',name:'부산시대회',trophy:'🦈',skin:'busan',skinName:'해일 블레이드',rarity:'전설',colors:['#b9f5ff','#167dc2','#103f7e']},{id:'okcheon',name:'옥천 3인 단체전',trophy:'🍇',skin:'okcheon',skinName:'포도송이 라켓',rarity:'영웅',colors:['#efe0ff','#7b3fd6','#3a145f']},{id:'pyeongtaek',name:'평택 2인 단체전',trophy:'🍐',skin:'pyeongtaek',skinName:'배꽃 챔피언 라켓',rarity:'전설',colors:['#f5ffc5','#b9d44c','#497737']},{id:'seoul',name:'서울시대회',trophy:'👑',skin:'seoul',skinName:'황궁 프레스티지',rarity:'신화',colors:['#fff3b0','#d24635','#51213f']}];
 const RACKET_ORBITS={champion:'🥖',sejong:'🌸',busan:'🦈',okcheon:'🍇',pyeongtaek:'🍐',seoul:'🏆',attendance_astral:'7'};
 const trophyIds=()=>{const saved=Array.isArray(prog.q?._trophies)?prog.q._trophies:[];return [...new Set([...(prog.q?._racketChampion||prog.q?._racketSkin==='champion'?['daejeon']:[]),...saved])];},trophyCount=()=>trophyIds().length,trophyMissBonus=()=>trophyCount()*.01,skinFor=id=>TOUR_REWARDS.find(r=>r.skin===id),equippedSkin=()=>skinFor(prog.q?._racketSkin==='champion'?'champion':prog.q?._racketSkin),skinOwned=id=>{const r=skinFor(id);return !!r&&(trophyIds().includes(r.id)||(id==='champion'&&!!prog.q?._racketChampion));},championOwned=()=>skinOwned('champion'),racketOrbit=()=>RACKET_ORBITS[equippedSkin()?.skin]||'',enhanceCombatLevel=()=>enhanceLevel();
-const enhanceFxTier=()=>{const lv=enhanceCombatLevel();return lv>=30?3:lv>=20?2:lv>=10?1:0;};
+const enhanceFxTier=()=>{if(ANDROID_LOW_SPEC)return 0;const lv=enhanceCombatLevel();return lv>=30?3:lv>=20?2:lv>=10?1:0;};
 const enhanceActive=()=>mode==='match'&&!rankOn&&!net;
 // Enhancement belongs only to the human player.  In AI matches it boosts the
 // player's shot and makes the opponent a little more likely to miss; it never
@@ -1426,8 +1428,8 @@ phantom:{name:'유령 커트',en:'PHANTOM',rgb:'180,140,255',glow:'#b48cff',desc
 const store={get:k=>{try{return localStorage.getItem('spinlab.'+k);}catch{return null;}},set:(k,v)=>{try{localStorage.setItem('spinlab.'+k,v);}catch{}}};
 const prefs=(()=>{try{return {...{ultSkip:false,reduceMotion:false,haptics:true},...JSON.parse(store.get('gamePrefs')||'{}')};}catch{return{ultSkip:false,reduceMotion:false,haptics:true};}})();
 const savePrefs=()=>store.set('gamePrefs',JSON.stringify(prefs));
-const ultMotion=()=>!prefs.ultSkip;
-const setShake=()=>{if(!prefs.reduceMotion)shakeT=time;};
+const ultMotion=()=>!ANDROID_LOW_SPEC&&!prefs.ultSkip;
+const setShake=()=>{if(!ANDROID_LOW_SPEC&&!prefs.reduceMotion)shakeT=time;};
 const vibrate=ms=>{if(prefs.haptics)navigator.vibrate?.(ms);};
 try{const nativeVibrate=navigator.vibrate?.bind(navigator);if(nativeVibrate)navigator.vibrate=ms=>prefs.haptics&&nativeVibrate(ms);}catch{}
 // Main-menu preferences deliberately live outside character/loadout settings so
@@ -1477,7 +1479,7 @@ const r=canvas.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
 const x=paddle.x/W,y=paddle.y/H;
 if(Math.abs(r.width-W)>5&&playing&&!paused)pause();
 if(r.width!==W||r.height!==H){swingMemory=null;release();lastTap=null;smashUntil=-1;me.x=foe.x=null;me.feet=foe.feet=null;}
-W=r.width;H=r.height;const d=Math.min(devicePixelRatio||1,2);canvas.width=W*d;canvas.height=H*d;ctx.setTransform(d,0,0,d,0,0);
+W=r.width;H=r.height;const d=renderPixelRatio();canvas.width=W*d;canvas.height=H*d;ctx.setTransform(d,0,0,d,0,0);
 paddle.x=P.clamp(x*W,10,W-10);paddle.y=P.clamp(y*H,10,H-10);
 }
 new ResizeObserver(resize).observe(canvas);addEventListener('orientationchange',()=>setTimeout(()=>{lockedW=0;resize();},250));
@@ -2776,7 +2778,7 @@ ctx.fillStyle='#ffffff20';ctx.fillRect(W*.3,H*.91,W*.4,3);ctx.fillStyle='#ffe4a3
 
 // Arena backdrop, drawn once per canvas size: crowd in the stands, a row of LED boards behind the far player, a floor grid.
 let arenaCache=null;
-function arenaBg(){const d=Math.min(devicePixelRatio||1,2);if(arenaCache&&arenaCache.w===W&&arenaCache.h===H&&arenaCache.v===view)return arenaCache.c;
+function arenaBg(){const d=renderPixelRatio();if(arenaCache&&arenaCache.w===W&&arenaCache.h===H&&arenaCache.v===view)return arenaCache.c;
 const c=document.createElement('canvas');c.width=W*d;c.height=H*d;const g=c.getContext('2d');g.scale(d,d);
 const top=H*.075,bh=H*.05;let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 const sg=g.createLinearGradient(0,0,0,top);sg.addColorStop(0,'#1a1040');sg.addColorStop(1,'#2b1a5e');g.fillStyle=sg;g.fillRect(0,0,W,top);
@@ -3935,7 +3937,7 @@ for(const ev of ['gesturestart','gesturechange','gestureend'])document.addEventL
 document.addEventListener('touchmove',e=>{if(e.touches.length>1||e.target===canvas||(playing&&!paused))e.preventDefault();},{passive:false});
 let lastTouchEnd=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouchEnd<350&&e.target===canvas)e.preventDefault();lastTouchEnd=now;},{passive:false});   // double tap on the court = smash, never zoom
 function recoverGameLoop(error,phase='simulation'){console.error('게임 루프 오류', {phase,playing,hasBall:!!ball,score:`${you}:${cpu}`,rally},error);/* Drawing is cosmetic. A failed effect/portrait must never erase an active rally. */if(phase==='render'){renderFaultUntil=performance.now()+250;return;}if(playing){/* point() clears the ball before finishing its optional effects.  Preserve that confirmed point instead of treating it as a new rally. */const scoreJustCommitted=!ball&&wait>1.45;ball=null;wait=scoreJustCommitted?Math.max(wait,.2):1.2;rally=0;trail=[];fx=[];swingMemory=null;lastTap=null;cdUntil=0;ultHoldUntil=0;release();$('rally').textContent='0';return;}paused=false;cdUntil=0;ultHoldUntil=0;try{reset();lockPage(false);}catch(recoveryError){console.error('게임 복구 화면을 표시하지 못했습니다.',recoveryError);}}
-function frame(t){try{tickVictoryCeremony();if(net&&net.dbl)dblView();if(net?.role==='guest'&&performance.now()-net.clockPingAt>5000)pingNetClock();const elapsed=Math.min((t-last)/1000||0,.1);last=t;for(let left=elapsed;left>1e-6&&playing&&!paused;left-=1/60)(net&&net.role==='guest'?guestUpdate:update)(Math.min(left,1/60));sendNetState(t);if(samples.length&&t-samples.at(-1).t>120){paddle.vx=paddle.vy=0;}$('speed').innerHTML=Math.round(Math.hypot(paddle.vx,paddle.vy))+' <small>px/s</small>';$('meter').style.width=Math.min(100,Math.hypot(paddle.vx,paddle.vy)/18)+'%';}catch(error){recoverGameLoop(error);}try{if(!$('auth-gate').open&&performance.now()>=renderFaultUntil)render();}catch(error){recoverGameLoop(error,'render');}finally{requestAnimationFrame(frame);}}requestAnimationFrame(frame);
+function frame(t){try{tickVictoryCeremony();if(net&&net.dbl)dblView();if(net?.role==='guest'&&performance.now()-net.clockPingAt>5000)pingNetClock();const elapsed=Math.min((t-last)/1000||0,ANDROID_LOW_SPEC?.2:.1);last=t;for(let left=elapsed;left>1e-6&&playing&&!paused;left-=1/60)(net&&net.role==='guest'?guestUpdate:update)(Math.min(left,1/60));sendNetState(t);if(samples.length&&t-samples.at(-1).t>120){paddle.vx=paddle.vy=0;}$('speed').innerHTML=Math.round(Math.hypot(paddle.vx,paddle.vy))+' <small>px/s</small>';$('meter').style.width=Math.min(100,Math.hypot(paddle.vx,paddle.vy)/18)+'%';}catch(error){recoverGameLoop(error);}try{if(!$('auth-gate').open&&performance.now()>=renderFaultUntil)render();}catch(error){recoverGameLoop(error,'render');}finally{requestAnimationFrame(frame);}}requestAnimationFrame(frame);
 </script><script src="prologue-match.js?v=10"></script><script src="prologue.js?v=9" onerror="window.mysPrologueBoot?.fail()"></script><script src="ceremony-media.js?v=synth2"></script><style id="spp-theme">/* ===== SPP 테마: 모바일 스포츠 게임 표준 (기준: eFootball · FIFA Mobile) =====
    밤 경기장 네이비 바탕 · 행동 색은 시안 하나 · 보상/레벨/티어는 골드 · 상대/위험은 레드
    숫자·점수는 콘덴스드 이탤릭(Barlow Condensed), 한글은 Pretendard. 모서리는 한 번 깎은 챔퍼. */

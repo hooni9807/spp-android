@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const html=fs.readFileSync('index.html','utf8');
+assert.match(html,/const ANDROID_LOW_SPEC=window\.Capacitor\?\.getPlatform\?\.\(\)==='android';/);
+assert.match(html,/const renderPixelRatio=\(\)=>ANDROID_LOW_SPEC\?1:Math\.min\(devicePixelRatio\|\|1,2\);/);
+assert.match(html,/const d=renderPixelRatio\(\);canvas\.width=W\*d/);
+assert.match(html,/function arenaBg\(\)\{const d=renderPixelRatio\(\);/);
+assert.match(html,/const ultMotion=\(\)=>!ANDROID_LOW_SPEC&&!prefs\.ultSkip;/);
+assert.match(html,/ANDROID_LOW_SPEC\?\.2:\.1/);
+assert.match(fs.readFileSync('android/app/src/main/AndroidManifest.xml','utf8'),/android:hardwareAccelerated="true"/);
+console.log('Android low-spec rendering is enabled');
