@@ -1,6 +1,6 @@
 // World tour hub. Only China has a playable roster at launch.
 (()=>{
-const WORLD_DIFFICULTY={china:'HELL',japan:'매우 어려움+',germany:'매우 어려움',sweden:'매우 어려움',france:'매우 어려움',romania:'매우 어려움',portugal:'매우 어려움',austria:'매우 어려움',korea:'준비 중',taiwan:'준비 중',india:'준비 중',brazil:'준비 중',usa:'준비 중',russia:'준비 중',europe:'준비 중'};
+const WORLD_DIFFICULTY={china:'HELL',japan:'매우 어려움+',germany:'매우 어려움',sweden:'매우 어려움',france:'매우 어려움',romania:'매우 어려움',portugal:'매우 어려움',austria:'매우 어려움',korea:'준비 중',taiwan:'준비 중',india:'준비 중',brazil:'준비 중',usa:'준비 중',russia:'준비 중',europe:'준비 중',hongkong:'준비 중',singapore:'준비 중',czechia:'준비 중',poland:'준비 중',slovenia:'준비 중',croatia:'준비 중',denmark:'준비 중',england:'준비 중',belgium:'준비 중',egypt:'준비 중'};
 const difficulty=id=>WORLD_DIFFICULTY[id]||'준비 중';
 chinaButton.remove();
 const button=document.createElement('button');button.id='world-open';button.type='button';button.textContent='세계정복';$('tournament-open').after(button);
@@ -22,11 +22,21 @@ const extraRegions=[
  ['taiwan','대만','M808 248L813 251L811 267L804 274L802 265Z',854,279],
  ['india','인도','M635 217L675 231L695 250L675 291L659 279L645 247Z',662,260],
  ['brazil','브라질','M224 252L269 248L296 281L282 321L259 343L239 318L231 286L214 272Z',258,291],
- ['usa','미국','M106 137L165 144L216 137L246 156L224 180L190 180L176 201L150 185L122 180Z',173,166]
+ ['usa','미국','M106 137L165 144L216 137L246 156L224 180L190 180L176 201L150 185L122 180Z',173,166],
+ ['hongkong','홍콩','M778 244L786 247L786 254L779 256Z',854,247],
+ ['singapore','싱가포르','M704 298L712 298L714 303L706 304Z',758,313],
+ ['czechia','체코','M480 154L492 151L500 157L492 162L481 161Z',399,145],
+ ['poland','폴란드','M490 132L507 130L513 141L502 148L490 143Z',556,132],
+ ['slovenia','슬로베니아','M483 176L491 174L496 178L491 182L484 181Z',411,181],
+ ['croatia','크로아티아','M495 180L503 178L508 185L504 193L498 190Z',566,194],
+ ['denmark','덴마크','M480 113L489 110L494 117L488 123L481 120Z',410,103],
+ ['england','잉글랜드','M447 128L455 125L461 135L455 143L447 140Z',375,118],
+ ['belgium','벨기에','M457 150L465 149L468 158L462 164L456 159Z',377,172],
+ ['egypt','이집트','M502 211L522 211L526 229L511 239L500 229Z',548,252]
 ];
 const map=dialog.querySelector('.world-atlas>svg'),land=map.querySelector('g'),labels=map.querySelectorAll('g')[1],svgNS='http://www.w3.org/2000/svg';
 // Leader lines keep compact European regions readable without enlarging their borders.
-for(const [id,x,y,tx,ty] of [['germany',488,151,410,127],['sweden',500,100,550,60],['france',463,166,403,159],['romania',522,175,560,182],['portugal',440,187,402,207],['austria',496,170,541,222]]){const line=document.createElementNS(svgNS,'path');line.setAttribute('d',`M${x} ${y}L${tx} ${ty}`);line.setAttribute('stroke','#9aaebf');line.setAttribute('fill','none');line.setAttribute('pointer-events','none');labels.prepend(line);}
+for(const [id,x,y,tx,ty] of [['germany',488,151,410,127],['sweden',500,100,550,60],['france',463,166,403,159],['romania',522,175,560,182],['portugal',440,187,402,207],['austria',496,170,541,222],['czechia',490,157,399,145],['poland',502,140,556,132],['slovenia',490,178,411,181],['croatia',502,184,566,194],['denmark',487,116,410,103],['england',454,134,375,118],['belgium',462,157,377,172],['egypt',512,224,548,252]]){const line=document.createElementNS(svgNS,'path');line.setAttribute('d',`M${x} ${y}L${tx} ${ty}`);line.setAttribute('stroke','#9aaebf');line.setAttribute('fill','none');line.setAttribute('pointer-events','none');labels.prepend(line);}
 const europeLabel=[...labels.querySelectorAll('text')].find(el=>el.textContent==='유럽');if(europeLabel){europeLabel.setAttribute('x','450');europeLabel.setAttribute('y','110');europeLabel.setAttribute('font-size','12');}
 for(const [id,name,d,x,y] of extraRegions){const region=document.createElementNS(svgNS,'path');region.setAttribute('d',d);region.dataset.region=id;region.setAttribute('tabindex','0');region.setAttribute('role','button');region.setAttribute('aria-label',name+' 준비 중');land.append(region);const label=document.createElementNS(svgNS,'text');label.setAttribute('x',x);label.setAttribute('y',y);label.setAttribute('font-size','14');label.textContent=name;labels.append(label);}
 dialog.querySelectorAll('[data-country]').forEach(button=>{const id=button.dataset.country;if(!button.textContent.includes(' · '))button.textContent=`${button.textContent} · ${difficulty(id)}`;});
