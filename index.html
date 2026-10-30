@@ -3149,7 +3149,13 @@ $('coach').textContent=verdict!=='ok'?`${FAM[inc]} 공은 ${ANSWER[inc]}(으)로
 const TAP_BUFFER_MS=160;
 function flushTapBuffer(){const q=tapBuffer;if(!q)return;if(!playing||paused||!ball||ball.owner!=='ai'||performance.now()>q.until){tapBuffer=null;return;}const wasDual=!!ball.dual&&!ball.dualHit,before=lastHit;hit(q.tap);if(!ball||ball.owner!=='ai'||q.firstDual&&wasDual&&ball.dualHit||!q.firstDual&&lastHit!==before)tapBuffer=null;}
 function queueTap(tap){tapBuffer={tap,until:performance.now()+TAP_BUFFER_MS,firstDual:!!ball?.dual&&!ball?.dualHit};flushTapBuffer();}
-function statusToast(){if(time>aiSpecialNoticeUntil)$('ai-special-notice').hidden=true;if(time>toastUntil)$('toast').textContent=ball&&ball.held?(ball.owner!=='you'?'상대 서브를 기다리세요':ball.tossed?'떨어질 때 스윙! ↓하회전(커트) ↑상회전 · 좌우로 그으면 코스':'내 서브 · 화면을 눌러 공을 토스하세요'):ball&&ball.owner==='ai'?(P.timing(ball)==='perfect'?'HIT! 지금 스윙':ball.bounces?(ball.y>.08?'WAIT · 내 쪽 끝선을 넘어올 때까지 기다리세요':'READY · 테이블 밖에서 스윙!'):'WAIT · 바운드를 기다리세요'):'상대 리턴을 기다리세요';}
+// 가운데 위 안내: 판정과 같은 P.timing()으로 고른다(예전엔 따로 y좌표를 봐서 실제 타이밍과 어긋났다). 공이 없을 땐 다음 서브 안내.
+function statusToast(){if(time>aiSpecialNoticeUntil)$('ai-special-notice').hidden=true;if(time<=toastUntil)return;let m;
+ if(!ball)m=playing?'다음 서브 준비 중…':'';
+ else if(ball.held)m=ball.owner!=='you'?'상대 서브를 기다리세요':ball.tossed?'떨어질 때 스윙! ↓하회전(커트) ↑상회전 · 좌우로 그으면 코스':'내 서브 · 화면을 눌러 공을 토스하세요';
+ else if(ball.owner==='ai'){const t=P.timing(ball);m=t==='perfect'?'HIT! 지금 스윙':t==='ready'?'READY · 링이 라켓 원에 맞을 때 스윙':t==='late'?'LATE · 늦었어요, 바로 스윙!':ball.bounces?'WAIT · 공이 내 쪽으로 올 때까지':'WAIT · 바운드를 기다리세요';}
+ else m='상대 리턴을 기다리세요';
+ if($('toast').textContent!==m)$('toast').textContent=m;}
 // ball pace: a bit slower to start, +2.5% per rally hit up to +40%; cuts fly 20% slower than topspin balls
 const PACE={base:.96,perHit:.025,max:1.4,cut:.8};
 function pace(){return (ball&&ball.owner==='ai'?1-R_('defSlow'):(net||aiRn)&&ball?1-oppR('defSlow'):1)*PACE.base*Math.min(PACE.max,1+PACE.perHit*rally)*(P.incoming(ball)==='cut'?PACE.cut:1);}
