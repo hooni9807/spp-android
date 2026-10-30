@@ -53,8 +53,8 @@ atlas.addEventListener('touchend',()=>{pinchStart=0;},{passive:true});
 setMapZoom(1.1);
 function stop(){clearTimeout(timer);flight?.cancel();flight=null;$('world-plane').hidden=true;$('world-route').setAttribute('visibility','hidden');document.querySelectorAll('.world-route-start,.world-route-end').forEach(el=>el.setAttribute('visibility','hidden'));}
 function render(country='china'){const done=!!tS().chinaCup,record=worldConquestRow?.(),count=record?.count||0;dialog.querySelector('[data-region="china"]').classList.toggle('conquered',done);$('world-progress').textContent=`정복 완료 ${count} / ${WORLD_COUNTRY_TOTAL||8}${conquestCount()?` · 정복 보너스: AI 리턴 하한 -${conquestBonus().toFixed(1)}%p`:''}`;const names={china:'중국',japan:'일본',europe:'유럽 연합팀',russia:'러시아',...Object.fromEntries(extraRegions.map(([id,name])=>[id,name]))};const s=saved();$('world-detail').innerHTML=country==='china'?`<h3>중국 제패 · ${done?'정복 완료':'도전 가능'}</h3><p>난이도 ${difficulty('china')} · 11점 단식 · 7전 4선승<br>출전 선수: ${LOOKS[charType].nick} · 점선 경로를 확인한 뒤 출발 버튼을 눌러 주세요.</p><div class="euro-roster">${CHINA_PLAYERS.map(p=>`<figure><img src="${FACES['china_'+p[0]].src}" alt="${p[1]}"><figcaption>${p[1]}<small>${p[2]}</small></figcaption></figure>`).join('')}</div><button id="world-depart">${s?`중국 대회 이어하기 ${s.my}:${s.ai}`:done?'중국으로 다시 출발':'중국으로 출발하기'}</button>`:`<h3>${names[country]} · ${difficulty(country)}</h3><p>전용 선수단 준비 중입니다. 현재는 중국에 출전할 수 있습니다.</p>`;if($('world-depart'))$('world-depart').onclick=depart;}
-function arrive(){stop();dialog.close();const s=saved();if(s){chinaRun=s;openChinaCup();}else openChinaCup();}
-function depart(){if(!loginGate()||playing||net)return;stop();let arrived=false;const arrive=()=>{if(arrived)return;arrived=true;stop();dialog.close();const s=saved();if(s)chinaRun=s;openChinaCup();};const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:4000;
+function arrive(){stop();dialog.close();setTimeout(()=>{const s=saved();if(s)chinaRun=s;openChinaCup();},0);}
+function depart(){if(!loginGate()||playing||net)return;stop();let arrived=false;const arrive=()=>{if(arrived)return;arrived=true;stop();dialog.close();setTimeout(()=>{const s=saved();if(s)chinaRun=s;openChinaCup();},0);};const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:4000;
  // Set the transition timer first.  A drawing/animation API failure on a specific
  // mobile WebView must never leave the player stuck on a dotted route.
  timer=setTimeout(arrive,duration+120);
@@ -69,8 +69,15 @@ let worldPointerAt=0;
 function activateWorldRegion(id){selectCountry(id);}
 dialog.querySelectorAll('[data-region]').forEach(p=>{p.onpointerup=e=>{if(e.pointerType==='touch'&&pinchStart)return;worldPointerAt=performance.now();e.preventDefault();activateWorldRegion(p.dataset.region);};p.onclick=e=>{e.preventDefault();/* Some Android WebViews deliver only click for SVG paths.  Ignore the synthetic click following pointerup, but keep click-only selection usable. */if(performance.now()-worldPointerAt<520)return;activateWorldRegion(p.dataset.region);};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activateWorldRegion(p.dataset.region);}};});
 const game=chinaGame;chinaGame=function(){const r=game();persist();return r;};
-const home=goHome;goHome=function(...args){if(chinaRun?.live)persist();return home.apply(this,args);};
+const home=goHome;goHome=function(...args){if(chinaRun)persist();return home.apply(this,args);};
 const result=showResult;showResult=function(won){const was=chinaActive(),r=result(won);if(was){persist();if(chinaRun?.my===4)open();}return r;};
+// A world-conquest run can be paused safely, or deliberately abandoned.
+// Keep those actions separate so a normal exit never destroys the saved series.
+const worldCampaignActive=()=>chinaActive()||(typeof euroActive==='function'&&euroActive()),worldExit=$('exit-btn'),normalExit=worldExit.onclick,worldForfeit=document.createElement('button');worldForfeit.type='button';worldForfeit.id='world-forfeit';worldForfeit.textContent='포기';worldForfeit.hidden=true;worldExit.after(worldForfeit);
+const worldHud=courtHud;courtHud=function(){worldHud();const active=worldCampaignActive();worldExit.textContent=active?'경기 중지':'나가기';worldForfeit.hidden=!active;};
+worldExit.onclick=()=>{if(!worldCampaignActive())return normalExit();if(confirm('경기를 중지하고 세계제패 진행 상황을 저장할까요?'))goHome();};
+worldForfeit.onclick=()=>{if(!worldCampaignActive()||!confirm('현재 세계제패를 포기할까요? 진행 중인 단식과 저장된 시리즈가 모두 사라집니다.'))return;if(chinaActive())chinaRun.live=false;if(typeof euroActive==='function'&&euroActive()){euroRun.live=false;euroSave?.();}goHome();toast('세계제패를 포기했습니다.',1.8);};
+const worldControlStyle=document.createElement('style');worldControlStyle.textContent='#world-forfeit{margin-left:8px;min-height:34px;padding:0 13px;border:1px solid #f87171;border-radius:8px;background:#3a1520;color:#ffe1e1;font:800 12px Arial}#world-forfeit[hidden]{display:none}';document.head.append(worldControlStyle);
 // Achievement/title attack reductions must never push a world-conquest AI below
 // its advertised final return floor.
 const conquestFinalReturn=P.returnRoll;P.returnRoll=function(ball,tier,chance,bonus=0){const rate=conquestFinalReturn(ball,tier,chance,bonus),floor=conquestReturnFloor();return floor&&!ball?.ult?Math.max(floor,rate):rate;};
