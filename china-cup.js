@@ -1,12 +1,12 @@
 // Seven singles, first to four wins. Opponents stay exclusive to this event.
 const CHINA_PLAYERS=[
- ['longtian','롱톈','천룡강림','#e5ae35',1.18,1.3,'랠리마다 공격 속도 상승'],
- ['linfeng','린펑','금강파쇄','#e56738',1.32,1.05,'강력한 직선 드라이브'],
- ['chenyu','천위','태극반전','#63d4c2',1.08,1.65,'느림과 빠름을 섞는 커트'],
- ['baihe','바이허','백학비상','#bddbfa',1.14,1.2,'좌우 끝을 노리는 코스 공격'],
- ['zhaohu','자오후','맹호출산','#f49a42',1.23,1.1,'찬스볼 스매시 강화'],
- ['sunjie','쑨제','영후환영','#b59bfc',1.12,1.3,'드라이브와 커트 페인트'],
- ['sheying','셰잉','영사관통','#8cdb72',1.1,1.9,'강한 회전의 연속 커트']
+ ['longtian','롱톈','천룡강림','#e5ae35',1.28,1.45,'랠리마다 공격 속도 상승'],
+ ['linfeng','린펑','금강파쇄','#e56738',1.42,1.2,'강력한 직선 드라이브'],
+ ['chenyu','천위','태극반전','#63d4c2',1.18,1.8,'느림과 빠름을 섞는 커트'],
+ ['baihe','바이허','백학비상','#bddbfa',1.24,1.35,'좌우 끝을 노리는 코스 공격'],
+ ['zhaohu','자오후','맹호출산','#f49a42',1.33,1.25,'찬스볼 스매시 강화'],
+ ['sunjie','쑨제','영후환영','#b59bfc',1.22,1.45,'드라이브와 커트 페인트'],
+ ['sheying','셰잉','영사관통','#8cdb72',1.2,2.1,'강한 회전의 연속 커트']
 ];
 let chinaRun=null,chinaStarting=false,chinaSpeechAt=0;
 // Transparent vector portraits share the game's cached face-image rendering path.
@@ -23,7 +23,7 @@ function chinaFaceSvg(i){const f=CHINA_FACES[i],color=CHINA_PLAYERS[i][3];return
 const chinaActive=()=>!!chinaRun?.live&&!net&&mode==='match'&&aiChar.startsWith('china_');
 for(const [id,name,,color] of CHINA_PLAYERS)LOOKS['china_'+id]={name,nick:name,boss:true,split:true,shirt:color,sleeve:color,collar:'#e8ca77',pants:'#182237',shorts:false,hair:'#201b19',skin:'#eac6a8',skinShade:'#c69477',kit:{name:'CHINA',color:'#efce72'},ceremony:'하오하오'};
 function chinaSay(words){foe.taunt=words==='你好'?'니하오!':'하오하오!';foe.tauntT=time;if(!sound||!window.speechSynthesis||Date.now()-chinaSpeechAt<1800)return;chinaSpeechAt=Date.now();const utterance=new SpeechSynthesisUtterance(words);utterance.lang='zh-CN';utterance.rate=1.15;speechSynthesis.speak(utterance);}
-function chinaGame(){if(!chinaRun?.live)return;aiTier='unight';setMode('match');chinaStarting=true;try{begin('china_'+CHINA_PLAYERS[chinaRun.order[chinaRun.round]][0]);}finally{chinaStarting=false;}if(!playing)return;aiFit=null;aiCharge=65;document.body.classList.add('china-cup');nightmareDomainEnd();$('cpu-name').textContent=`중국 제패 · ${LOOKS[aiChar].nick} · ${chinaRun.round+1}경기 · ${chinaRun.my}:${chinaRun.ai}`;chinaSay('你好');}
+function chinaGame(){if(!chinaRun?.live)return;aiTier='unight';setMode('match');chinaStarting=true;try{begin('china_'+CHINA_PLAYERS[chinaRun.order[chinaRun.round]][0]);}finally{chinaStarting=false;}if(!playing)return;aiFit=null;aiCharge=80;document.body.classList.add('china-cup');nightmareDomainEnd();$('cpu-name').textContent=`중국 제패 · ${LOOKS[aiChar].nick} · ${chinaRun.round+1}경기 · ${chinaRun.my}:${chinaRun.ai}`;chinaSay('你好');}
 function startChinaCup(){if(!loginGate()||net||playing)return;$('china-cup-info').close();$('tournament-select').close();const order=CHINA_PLAYERS.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}chinaRun={order,round:0,my:0,ai:0,live:true,last:null};chinaGame();}
 CHINA_PLAYERS.forEach((p,i)=>{const key='china_'+p[0],im=new Image();FACES[key]=im;im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(chinaFaceSvg(i));Object.assign(LOOKS[key],{face:key,faceFit:{h:40,b:22,cx:.5},hair:CHINA_FACES[i].hair,skin:CHINA_FACES[i].skin});});
 const chinaBegin=begin;begin=function(...args){if(!chinaStarting){chinaRun=null;document.body.classList.remove('china-cup');}return chinaBegin.apply(this,args);};
