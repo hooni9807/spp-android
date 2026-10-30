@@ -1,6 +1,7 @@
 // National kit references are recorded in docs/europe-art-direction.md.
 // Fictional athletes: appearance varies by individual, not a national facial stereotype.
 const EURO_KITS={
+ japan:{base:'#242643',trim:'#e65f9b',accent:'#f7c8dd',code:'JPN'},
  germany:{base:'#b51b67',trim:'#201c32',accent:'#e9519b',code:'GER'},
  sweden:{base:'#f4d72c',trim:'#19559b',accent:'#247bbd',code:'SWE'},
  france:{base:'#132f5b',trim:'#e4354e',accent:'#eef5ff',code:'FRA'},
@@ -14,6 +15,7 @@ function drawNationalKit(g,look,x,y,h,s){
  g.fillStyle=k.trim;
  const poly=(points,color)=>{g.fillStyle=color;g.beginPath();points.forEach(([a,b],i)=>i?g.lineTo(a,b):g.moveTo(a,b));g.closePath();g.fill();};
  switch(look.nationalKit){
+ case 'japan':{const belt=g.createLinearGradient(0,8,0,55);belt.addColorStop(0,k.base);belt.addColorStop(.5,k.trim);belt.addColorStop(1,k.base);g.fillStyle=belt;g.fillRect(-32,8,64,50);for(let i=0;i<5;i++)poly([[-32,20+i*6],[32,12+i*6],[32,13+i*6],[-32,21+i*6]],'#f7c8dd55');break;}
  case 'germany':poly([[-32,0],[-19,0],[-11,64],[-32,64]],k.trim);for(let i=0;i<7;i++)poly([[-25,26+i*6],[25,17+i*6],[25,20+i*6],[-25,29+i*6]],i%2?k.accent:'#8c1b55');break;
  case 'sweden':poly([[-32,0],[-20,0],[-14,64],[-32,64]],k.trim);poly([[20,0],[32,0],[32,64],[14,64]],k.trim);g.fillStyle=k.accent;g.fillRect(-27,3,54,3);break;
  case 'france':for(let i=0;i<8;i++)poly([[-30,i*9],[30,i*9-10],[30,i*9-8],[-30,i*9+2]],'#25416a');poly([[-32,0],[-20,0],[-15,64],[-24,64]],k.trim);poly([[22,0],[26,0],[20,64],[16,64]],k.accent);break;
@@ -38,6 +40,7 @@ Object.entries(EURO_CUPS).forEach(([id,c],n)=>c.names.forEach((_,i)=>{const key=
 function euroEffectArt(id,i){
  const rays=Array.from({length:8+i},(_,j)=>`<path transform="rotate(${j*360/(8+i)} 150 75)" d="M150 24V10M150 126V140"/>`).join('');
  const art={
+ japan:japanArt(i),
  germany:`<g class="euro-rotor"><circle cx="150" cy="75" r="51"/><circle cx="150" cy="75" r="35"/>${rays}</g><path class="euro-strike" d="M0 75H300M30 66H270M60 84H240"/>`,
  sweden:`${[0,1,2,3].map(j=>`<path class="euro-ribbon" style="animation-delay:${j*70}ms" d="M0 ${40+j*15}Q60 ${-30+j*15} 150 ${65+j*10}T300 ${30+j*15}"/>`).join('')}`,
  france:`${[0,1,2].map(j=>`<path class="euro-thrust" style="animation-delay:${j*120}ms" d="M${10+j*20} ${125-j*30}L${280-j*10} ${20+j*20}l-30 5m30-5l-20 18"/>`).join('')}`,
@@ -47,7 +50,7 @@ function euroEffectArt(id,i){
  };return `<svg viewBox="0 0 300 150" aria-hidden="true" style="--variant:${i}">${art[id]}</svg>`;
 }
 const euroDesignedFire=fireUlt;fireUlt=function(u,x,y,ai=false,...args){const on=ai&&euroActive(),id=on&&euroRun.country,i=on&&euroRun.order[euroRun.round],r=euroDesignedFire(u,x,y,ai,...args);if(on){const el=document.querySelector('.euro-impact');if(el){el.querySelector('svg')?.remove();el.insertAdjacentHTML('afterbegin',euroEffectArt(id,i));el.dataset.athlete=i;}if(foe.ultMove)foe.ultMove.euroCountry=id;}return r;};
-const euroDesignedBody=ultBodyOffset;ultBodyOffset=function(st,side,s){const m=st.ultMove,id=m?.euroCountry;if(!id||matchMedia('(prefers-reduced-motion: reduce)').matches||m.owner&&ball?.owner!==m.owner)return euroDesignedBody(st,side,s);const t=(performance.now()/1000-m.t-ultFinalStart(m.u))/ULT_ACTION_SEC;if(t<0||t>1)return{x:0,y:0};const arc=Math.sin(Math.PI*t),snap=Math.sin(Math.PI*Math.min(1,t*2));const paths={germany:[-24*s*snap,0],sweden:[32*s*Math.sin(t*Math.PI*2)*arc,-12*s*arc],france:[-85*s*snap,5*s*arc],romania:[-18*s*arc,15*s*arc],portugal:[45*s*Math.sin(t*Math.PI*2)*arc,-20*s*arc],austria:[-25*s*arc,-90*s*arc]};return{x:side*paths[id][0],y:paths[id][1]};};
+const euroDesignedBody=ultBodyOffset;ultBodyOffset=function(st,side,s){const m=st.ultMove,id=m?.euroCountry;if(!id||matchMedia('(prefers-reduced-motion: reduce)').matches||m.owner&&ball?.owner!==m.owner)return euroDesignedBody(st,side,s);const t=(performance.now()/1000-m.t-ultFinalStart(m.u))/ULT_ACTION_SEC;if(t<0||t>1)return{x:0,y:0};const arc=Math.sin(Math.PI*t),snap=Math.sin(Math.PI*Math.min(1,t*2));const paths={japan:[-(35+(euroRun?.order[euroRun.round]||0)*5)*s*snap,-32*s*arc],germany:[-24*s*snap,0],sweden:[32*s*Math.sin(t*Math.PI*2)*arc,-12*s*arc],france:[-85*s*snap,5*s*arc],romania:[-18*s*arc,15*s*arc],portugal:[45*s*Math.sin(t*Math.PI*2)*arc,-20*s*arc],austria:[-25*s*arc,-90*s*arc]};return{x:side*paths[id][0],y:paths[id][1]};};
 const euroDesignStyle=document.createElement('style');euroDesignStyle.textContent=`
 .euro-impact svg{overflow:visible;stroke-width:2.5;filter:drop-shadow(0 0 3px currentColor)}
 .euro-impact[data-country="france"] svg{stroke:#e9f4ff}.euro-impact[data-country="france"] path:nth-child(2){stroke:#e94458}
@@ -62,3 +65,25 @@ const euroDesignStyle=document.createElement('style');euroDesignStyle.textConten
 @media(prefers-reduced-motion:reduce){.euro-impact svg *{animation:none!important;filter:none}}
 `;document.head.append(euroDesignStyle);
 PATCH_NOTES.unshift(['유럽 세계정복 선수 디자인','6개국 42명의 얼굴과 국가대표 경기복을 참고한 의상을 새로 구성했습니다. 기어·오로라·펜싱·초승달·파도·설산 필살기 효과와 국가별 동작이 추가되었습니다.']);
+function japanArt(i){
+ const petal=(x,y,a)=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0Q-17 -17 -8 -27L0 -23L8 -27Q17 -17 0 0Z"/>`;
+ const petals=Array.from({length:12},(_,j)=>petal(30+j*21,30+(j%3)*40,j*37)).join('');
+ return [
+ '<g class="euro-thrust"><path d="M145 0L160 148M151 0L166 148M110 117L190 117"/><path d="M20 130L280 20"/></g>',
+ '<g class="euro-ribbon" fill="#f8a8ca" stroke-width="1">'+petals+'</g>',
+ '<g class="euro-thrust"><path d="M20 100L90 25L150 115L220 25L290 100M15 110L85 35L145 125L215 35L285 110"/></g>',
+ '<g class="euro-rotor"><circle cx="80" cy="75" r="33"/><circle cx="150" cy="75" r="48"/><circle cx="220" cy="75" r="33"/></g>',
+ '<g class="euro-tide"><path d="M0 100Q50 10 100 85T200 85T300 70M0 120Q50 30 100 105T200 105T300 90"/></g>',
+ '<g class="euro-peaks"><path d="M150 115Q95 15 15 35L110 85L150 115L190 85L285 35Q205 15 150 115M150 115V25"/></g>',
+ '<g class="euro-peaks"><path d="M10 140L150 20L290 140ZM115 50L135 58L150 43L165 58L185 50"/><circle cx="220" cy="35" r="23"/></g>'
+ ][i];
+}
+// Individual Japanese squad portraits: distinct hair silhouettes and accessories, not ethnic caricatures.
+Object.values(EURO_CUPS.japan.names).forEach((_,i)=>{
+ const key='china_japan_'+i,p=euroPortrait('japan',6,i),hair=['#25232e','#342c38','#1e2830','#473128','#252a40','#353039','#252131'][i];
+ let svg=p.svg.replaceAll(p.hair,hair);
+ if(i===1)svg=svg.replace('</svg>','<path d="M127 50Q160 55 143 117L132 92Z" fill="'+hair+'"/><circle cx="131" cy="58" r="7" fill="#f4a1c6"/></svg>');
+ if(i===4)svg=svg.replace('</svg>','<path d="M45 69Q90 22 137 69L127 82L115 64L100 81L84 65L69 82L54 66Z" fill="'+hair+'"/></svg>');
+ const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);FACES[key]=im;LOOKS[key].hair=hair;
+});
+PATCH_NOTES.unshift(['일본 제패','세계정복에 일본 7전 4선승을 추가했습니다. 유럽보다 강하고 중국보다 낮은 종합 공격 설정, 7명 전용 패시브·검도·벚꽃 필살기, PERFECT 오이쉬! 대사와 이어하기를 지원합니다.']);
