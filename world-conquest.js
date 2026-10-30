@@ -64,7 +64,9 @@ function centerOnKorea(){const koreaX=814/1000;atlas.scrollLeft=Math.max(0,Math.
 function open(){stop();selectedCountry=null;setMapZoom(1.1);render();dialog.querySelectorAll('[data-region]').forEach(region=>region.classList.remove('selected'));if(!dialog.open)dialog.showModal();}
 button.onclick=open;$('world-close').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{stop();selectedCountry=null;});dialog.addEventListener('cancel',stop);
 window.sppWorldContinueChinaReady=()=>!!saved();
-window.sppWorldContinueChina=()=>{const s=saved();if(!s)return open();chinaRun=s;setCharacter(s.character);chinaGame();};
+// "이어하기"도 바로 경기를 재개하지 않는다.  다음 단식의 선수 명단을
+// 확인·변경한 뒤 시작할 수 있도록 항상 출전 명단 화면을 먼저 연다.
+window.sppWorldContinueChina=()=>{const s=saved();if(!s)return open();chinaRun=s;openChinaCup();};
 let worldPointerAt=0;
 function activateWorldRegion(id){selectCountry(id);}
 dialog.querySelectorAll('[data-region]').forEach(p=>{p.onpointerup=e=>{if(e.pointerType==='touch'&&pinchStart)return;worldPointerAt=performance.now();e.preventDefault();activateWorldRegion(p.dataset.region);};p.onclick=e=>{e.preventDefault();/* Some Android WebViews deliver only click for SVG paths.  Ignore the synthetic click following pointerup, but keep click-only selection usable. */if(performance.now()-worldPointerAt<520)return;activateWorldRegion(p.dataset.region);};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activateWorldRegion(p.dataset.region);}};});
