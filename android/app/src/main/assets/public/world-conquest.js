@@ -64,7 +64,9 @@ function open(){stop();selectedCountry=null;setMapZoom(1.1);render();dialog.quer
 button.onclick=open;$('world-close').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{stop();selectedCountry=null;});dialog.addEventListener('cancel',stop);
 window.sppWorldContinueChinaReady=()=>!!saved();
 window.sppWorldContinueChina=()=>{const s=saved();if(!s)return open();chinaRun=s;setCharacter(s.character);chinaGame();};
-dialog.querySelectorAll('[data-region]').forEach(p=>{const choose=()=>selectCountry(p.dataset.region);p.onpointerup=e=>{if(e.pointerType==='touch'&&pinchStart)return;const id=p.dataset.region;if(selectedCountry===id){e.preventDefault();window.dispatchEvent(new CustomEvent('sppWorldDepart',{detail:{id}}));if(id==='china')depart();return;}choose();};p.onclick=e=>e.preventDefault();p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}};});
+let worldPointerAt=0;
+function activateWorldRegion(id){if(selectedCountry===id){window.dispatchEvent(new CustomEvent('sppWorldDepart',{detail:{id}}));if(id==='china')depart();return;}selectCountry(id);}
+dialog.querySelectorAll('[data-region]').forEach(p=>{p.onpointerup=e=>{if(e.pointerType==='touch'&&pinchStart)return;worldPointerAt=performance.now();e.preventDefault();activateWorldRegion(p.dataset.region);};p.onclick=e=>{e.preventDefault();/* Some Android WebViews deliver only click for SVG paths.  Ignore the synthetic click following pointerup, but keep click-only selection usable. */if(performance.now()-worldPointerAt<520)return;activateWorldRegion(p.dataset.region);};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activateWorldRegion(p.dataset.region);}};});
 const game=chinaGame;chinaGame=function(){const r=game();persist();return r;};
 const home=goHome;goHome=function(...args){if(chinaRun?.live)persist();return home.apply(this,args);};
 const result=showResult;showResult=function(won){const was=chinaActive(),r=result(won);if(was){persist();if(chinaRun?.my===4)open();}return r;};
