@@ -47,6 +47,9 @@ let euroFlight=null,euroTimer=0;
 function euroCancel(){clearTimeout(euroTimer);euroFlight?.cancel();euroFlight=null;$('world-plane').hidden=true;}
 function euroTravel(id){if(!loginGate()||playing||net)return;euroCancel();const c=EURO_CUPS[id],plane=$('world-plane');drawFace(plane.querySelector('canvas'),LOOKS[euroSaved(id)?.character||charType]);plane.hidden=false;$('world-route').setAttribute('d',`M820 215Q650 40 ${c.xy[0]} ${c.xy[1]}`);$('world-route').setAttribute('visibility','visible');$('world-detail').innerHTML=`<h3>${c.name}으로 출발합니다</h3><button id="euro-skip">건너뛰기</button>`;const arrive=()=>{euroCancel();$('world-map').close();euroStart(id);};$('euro-skip').onclick=arrive;const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:3500;euroFlight=plane.animate([{left:'82%',top:'44%'},{left:'65%',top:'10%',offset:.5},{left:c.xy[0]/10+'%',top:c.xy[1]/4.8+'%'}],{duration,fill:'forwards'});euroTimer=setTimeout(arrive,duration);}
 document.addEventListener('click',e=>{const region=e.target.closest?.('[data-country],[data-region]');if(region&&$('world-map').contains(region)){euroCancel();const id=region.dataset.country||region.dataset.region;if(EURO_CUPS[id]){e.preventDefault();e.stopImmediatePropagation();euroMap(id);}else setTimeout(euroColors,0);}if(e.target.closest?.('#world-open'))setTimeout(euroColors,0);},true);
+// The map owns selection.  A second tap on the already selected playable
+// country emits this event, so travel never starts accidentally on first tap.
+addEventListener('sppWorldDepart',event=>{const id=event.detail?.id;if(EURO_CUPS[id])euroTravel(id);});
 $('world-map').addEventListener('close',euroCancel);$('world-map').addEventListener('cancel',euroCancel);
 addEventListener('pagehide',euroSave);
 euroColors();
