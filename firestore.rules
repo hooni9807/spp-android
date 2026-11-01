@@ -74,6 +74,30 @@ service cloud.firestore {
       allow read: if true;
       allow create: if valid(10000);
     }
+    // 스테이지 돌파 전체 랭킹: 계정당 최고 기록 한 줄만 공개한다.
+    match /stage_progress/{uid} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider in ['google.com', 'custom']
+        && request.resource.data.keys().hasOnly(['name', 'ttl', 'value', 'character', 'detail', 'at'])
+        && request.resource.data.keys().hasAll(['name', 'value', 'character', 'detail', 'at'])
+        && (!('ttl' in request.resource.data) || request.resource.data.ttl is string && request.resource.data.ttl.size() <= 12)
+        && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 12
+        && request.resource.data.value is int && request.resource.data.value >= 1 && request.resource.data.value <= 10000
+        && request.resource.data.character is string && request.resource.data.character.size() >= 1 && request.resource.data.character.size() <= 24
+        && request.resource.data.detail is string && request.resource.data.detail.size() <= 20
+        && request.resource.data.at == request.time;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider in ['google.com', 'custom']
+        && request.resource.data.keys().hasOnly(['name', 'ttl', 'value', 'character', 'detail', 'at'])
+        && request.resource.data.keys().hasAll(['name', 'value', 'character', 'detail', 'at'])
+        && (!('ttl' in request.resource.data) || request.resource.data.ttl is string && request.resource.data.ttl.size() <= 12)
+        && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 12
+        && request.resource.data.value is int && request.resource.data.value >= resource.data.value && request.resource.data.value <= 10000
+        && request.resource.data.character is string && request.resource.data.character.size() >= 1 && request.resource.data.character.size() <= 24
+        && request.resource.data.detail is string && request.resource.data.detail.size() <= 20
+        && request.resource.data.at == request.time;
+    }
     match /rally_boss/{id} {
       allow read: if true;
       allow create: if valid(10000);
@@ -142,6 +166,17 @@ service cloud.firestore {
     }
     // 칭호 (ttl): optional title id on ranking rows, PvP, presence and level rows.
     // 친구창: who is online. Each signed-in player writes only its own presence doc.
+    match /public_progress/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider in ['google.com', 'custom']
+        && request.resource.data.keys().hasOnly(['titles','titleTotal','achievements','achievementTotal','at'])
+        && request.resource.data.titleTotal is int && request.resource.data.titleTotal >= 0 && request.resource.data.titleTotal <= 10000
+        && request.resource.data.titles is int && request.resource.data.titles >= 0 && request.resource.data.titles <= request.resource.data.titleTotal
+        && request.resource.data.achievementTotal is int && request.resource.data.achievementTotal >= 0 && request.resource.data.achievementTotal <= 10000
+        && request.resource.data.achievements is int && request.resource.data.achievements >= 0 && request.resource.data.achievements <= request.resource.data.achievementTotal
+        && request.resource.data.at == request.time;
+    }
     match /presence/{uid} {
       allow read: if true;
       allow create, update: if request.auth != null && request.auth.uid == uid
@@ -242,8 +277,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll(['name', 'countries', 'count', 'at'])
         && (!('ttl' in request.resource.data) || request.resource.data.ttl is string && request.resource.data.ttl.size() <= 12)
         && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 12
-        && request.resource.data.countries is list && request.resource.data.countries.size() >= 1 && request.resource.data.countries.size() <= 9
-        && request.resource.data.countries.hasOnly(['china', 'japan', 'germany', 'sweden', 'france', 'romania', 'portugal', 'austria', 'korea'])
+        && request.resource.data.countries is list && request.resource.data.countries.size() >= 1 && request.resource.data.countries.size() <= 21
+        && request.resource.data.countries.hasOnly(['china', 'japan', 'germany', 'sweden', 'france', 'romania', 'portugal', 'austria', 'russia', 'taiwan', 'india', 'brazil', 'usa', 'singapore', 'nigeria', 'canada', 'argentina', 'australia', 'southafrica', 'mexico', 'greenland'])
         && request.resource.data.count is int && request.resource.data.count == request.resource.data.countries.size()
         && request.resource.data.at == request.time;
     }

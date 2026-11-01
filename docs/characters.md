@@ -219,6 +219,14 @@
 왼쪽으로 갈 때는 좌우를 반대로 합니다. 참고: [All About Table Tennis – Footwork](https://www.allabouttabletennis.com/table-tennis-footwork.html), [ActiveSG – Proper footwork](https://www.activesgcircle.gov.sg/learn/table-tennis/what-is-the-proper-footwork-for-table-tennis), [Modern Cross-step](https://protabletennis.net/content/modern-cross-step)
 - 참고: [Critical Features of the Forehand Topspin](https://protabletennis.net/content/critical-features-forehand-topspin), [How to Play a Backhand Push](https://www.experttabletennis.com/how-to-play-a-backhand-push-in-table-tennis/), [Backhand Push (tabletennisteacher)](https://tabletennisteacher.com/learn-backhand-push/)
 
+## 평택임씨
+- 정장 차림의 찬스볼 저격수 · 차분한 정석 플레이
+- **찬스 스매시**: 뜬 공(찬스볼)을 스매싱하면 상대가 받아낼 확률이 **30%**로 떨어져요 (보스 포함)
+- **어머! 스매싱**: 포핸드 드라이브가 5% 확률로 스매싱으로 바뀌어 ×1.45 강하게 들어가요
+- 약점: 드라이브 속도 −20% · 회전 −20%
+- 외형: 검정 정장 재킷(라펠 · 흰 셔츠 V) · 긴소매 · 손목시계 · 하늘색 단 검정 플리츠 스커트
+- PERFECT: "어머!"
+
 ## 탈주닌자 맹타치
 - 드라이브 불가: 드라이브 스윙도 쇼트로 넘어가요 (상대 드라이브엔 블록) · 탭(터치) 쇼트 속도 ×1.4 · 드라이브 스윙이 바뀐 쇼트는 ×1.2
 - 상대 커트 공은 커트 스윙으로 받아야 해요 · 뜬 공은 스매시
