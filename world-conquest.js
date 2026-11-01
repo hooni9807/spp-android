@@ -92,7 +92,7 @@ worldForfeit.onclick=()=>{if(!worldCampaignActive()||!confirm('현재 세계제�
 const worldControlStyle=document.createElement('style');worldControlStyle.textContent='#world-forfeit{margin-left:8px;min-height:34px;padding:0 13px;border:1px solid #f87171;border-radius:8px;background:#3a1520;color:#ffe1e1;font:800 12px Arial}#world-forfeit[hidden]{display:none}';document.head.append(worldControlStyle);
 // Achievement/title attack reductions must never push a world-conquest AI below
 // its advertised final return floor.
-const WORLD_ULT_RETURN={1:.60,2:.50,3:.40,4:.30};
-const conquestFinalReturn=P.returnRoll;P.returnRoll=function(ball,tier,chance,bonus=0){if(worldCampaignActive()&&ball?.ult)return WORLD_ULT_RETURN[ball.ultTier]??.30;const rate=conquestFinalReturn(ball,tier,chance,bonus),floor=conquestReturnFloor();return floor&&!ball?.ult?Math.max(floor,rate):rate;};
+const WORLD_ULT_RETURN={1:.75,2:.65,3:.55,4:.45};
+const conquestFinalReturn=P.returnRoll;P.returnRoll=function(ball,tier,chance,bonus=0){if(worldCampaignActive()&&ball?.ult)return WORLD_ULT_RETURN[ball.ultTier]??.45;const rate=conquestFinalReturn(ball,tier,chance,bonus),floor=conquestReturnFloor();return floor&&!ball?.ult?Math.max(floor,rate):rate;};
 addEventListener('pagehide',()=>{if(chinaRun?.live)persist();});
 })();
