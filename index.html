@@ -727,11 +727,13 @@ const RANK_TIERS=[
 {id:'b1',n:'1부',icon:'🏓',c:'#b794f4',min:1800,dif:'b1',ai:'uext',returnRate:.90},
 {id:'pro',n:'선수부',icon:'👑',c:'#ff8c42',min:2000,dif:'pro',ai:'unight',returnRate:.95}];
 const RANK_RETURN_BOOST=[.2,.3,.4,.5,.6,.7,.8,.9,.95],RANK_ULT_RETURN=[0,.02,.04,.06,.08,.10,.15,.20,.25];
+// 랭크전 필살기 리턴률 [1티어,2티어,3티어,4티어]: 초심부 → 선수부(80/70/60/50%).
+const RANK_ULT_BY_OPP=[[.30,.20,.10,.05],[.37,.27,.17,.10],[.44,.34,.24,.15],[.51,.41,.31,.20],[.58,.48,.38,.25],[.64,.54,.44,.32],[.70,.60,.50,.38],[.75,.65,.55,.44],[.80,.70,.60,.50]];
 const RANK_START=1000;let rankArmed=false,rankOn=false,rankStarting=false,rankGame=null;
 const rankIdx=m=>{let i=0;RANK_TIERS.forEach((t,k)=>{if(m>=t.min)i=k;});return i;},rankTier=m=>RANK_TIERS[rankIdx(m)];
 function rankName(m){return rankTier(m).n;}
 function rankLocal(){try{return {mmr:RANK_START,w:0,l:0,ws:0,ls:0,peak:RANK_START,...JSON.parse(store.get('arank'))};}catch{return {mmr:RANK_START,w:0,l:0,ws:0,ls:0,peak:RANK_START};}}
-const rawRankReturnRoll=P.returnRoll;P.returnRoll=(ball,tier,chance,bonus=0)=>{const rate=rankOn&&rankGame?.returnRate,norm=rankGame?.returnNorm,ult=rankOn&&rankGame&&ball?.ult?(P.ULT_RETURN_BY_TIER[RANK_TIERS[rankGame.opp].ai]||P.ULT_RETURN_BY_TIER.uext)[ball.ultTier-1]??.45:null;   /* 랭크전: 상대 부수의 AI 난이도 기준 필살기 리턴률 */if(ult!=null)return ult;if(rate!=null&&norm&&P.normalShot(ball))return Math.max(0,Math.min(rate,chance*rate/norm)-Math.min(.95,Math.max(0,ball.defMiss||0)));return rawRankReturnRoll(ball,tier,chance,bonus);};
+const rawRankReturnRoll=P.returnRoll;P.returnRoll=(ball,tier,chance,bonus=0)=>{const rate=rankOn&&rankGame?.returnRate,norm=rankGame?.returnNorm,ult=rankOn&&rankGame&&ball?.ult?(RANK_ULT_BY_OPP[rankGame.opp]||RANK_ULT_BY_OPP.at(-1))[ball.ultTier-1]??.5:null;   /* 랭크전: 부수별 필살기 리턴률 */if(ult!=null)return ult;if(rate!=null&&norm&&P.normalShot(ball))return Math.max(0,Math.min(rate,chance*rate/norm)-Math.min(.95,Math.max(0,ball.defMiss||0)));return rawRankReturnRoll(ball,tier,chance,bonus);};
 function rankDayDelta(mmr,now=Date.now(),player='self'){
 const day=String(Math.floor((now+9*3600000)/(6*3600000))),key='arank-six-hour:'+player;let days={};try{days=JSON.parse(store.get(key))||{};}catch{}
 const prior=Object.keys(days).filter(d=>Number(d)<Number(day)).sort((a,b)=>Number(a)-Number(b)).at(-1),previous=prior?days[prior]:null,current=days[day];
