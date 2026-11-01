@@ -323,8 +323,10 @@ function returnChance(b,tier,chance,bonus=0){if(!normalShot(b)||RETURN_RATE[tier
 if(typeof document!=='undefined'){const info=document.querySelector('[data-tier="uext"] small');if(info)info.textContent='가장 빠른 공격과 강한 회전 · 일반 공 리턴 시도 성공률 95% · 원터치 15% · 투터치 85% 혼합 · AI 스킬 25P · 3~4티어 필살기';}
 // Ultimate returns are an explicit per-tier rule, independent of AI difficulty bonuses.
 const ULT_RETURN_RATE={1:.50,2:.30,3:.10,4:.05};
+// AI 대전 난이도별 필살기 리턴률 [1티어,2티어,3티어,4티어]. 울트라 나이트메어 75/65/55/45%를 기준으로 아래 난이도를 맞춘다. (보스전 등 다른 모드는 위 기본값)
+const ULT_RETURN_BY_TIER={easy:[.25,.15,.05,0],hard:[.35,.25,.10,.05],extreme:[.45,.35,.20,.10],ultra:[.55,.45,.30,.20],uhard:[.62,.52,.40,.30],uext:[.68,.58,.48,.38],unight:[.75,.65,.55,.45]};
 // A move's stated defensive miss chance is applied after the AI tier bonus, so it cannot be erased by a high return tier.
-function returnRoll(b,tier,chance,bonus=0){if(b?.floatFault&&b.floatReturn===true)return 1;   /* 내 실수로 뜬 공은 AI가 50% 확률로 확실히 처리 */if(b?.ult){const r=ULT_RETURN_RATE[b.ultTier]??.05;return conquestReturnFloor()?Math.max(.1,r):r;}   /* 세계정복: 필살기 받을 확률 최저 10% */return Math.max(0,returnChance(b,tier,chance,bonus)-Math.min(.95,Math.max(0,b.defMiss||0)));}
+function returnRoll(b,tier,chance,bonus=0){if(b?.floatFault&&b.floatReturn===true)return 1;   /* 내 실수로 뜬 공은 AI가 50% 확률로 확실히 처리 */if(b?.ult){const tt=(mode==='match'&&!net&&!rankOn)?ULT_RETURN_BY_TIER[tierNow()]:null,r=tt?tt[b.ultTier-1]??tt[3]:ULT_RETURN_RATE[b.ultTier]??.05;return conquestReturnFloor()?Math.max(.1,r):r;}   /* 세계정복: 필살기 받을 확률 최저 10% */return Math.max(0,returnChance(b,tier,chance,bonus)-Math.min(.95,Math.max(0,b.defMiss||0)));}
 // Rally placement reading: repeating one lane lets the AI anticipate it, while
 // alternating wide lanes makes it move and lowers its next return chance.
 let aiRouteRead={last:null,run:0,switches:0};
