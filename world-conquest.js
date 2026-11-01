@@ -92,7 +92,9 @@ worldForfeit.onclick=()=>{if(!worldCampaignActive()||!confirm('현재 세계제�
 const worldControlStyle=document.createElement('style');worldControlStyle.textContent='#world-forfeit{margin-left:8px;min-height:34px;padding:0 13px;border:1px solid #f87171;border-radius:8px;background:#3a1520;color:#ffe1e1;font:800 12px Arial}#world-forfeit[hidden]{display:none}';document.head.append(worldControlStyle);
 // Achievement/title attack reductions must never push a world-conquest AI below
 // its advertised final return floor.
-const WORLD_ULT_RETURN={1:.75,2:.65,3:.55,4:.45};
-const conquestFinalReturn=P.returnRoll;P.returnRoll=function(ball,tier,chance,bonus=0){if(worldCampaignActive()&&ball?.ult)return WORLD_ULT_RETURN[ball.ultTier]??.45;const rate=conquestFinalReturn(ball,tier,chance,bonus),floor=conquestReturnFloor();return floor&&!ball?.ult?Math.max(floor,rate):rate;};
+// 세계정복 필살기 리턴률 [1티어,2티어,3티어,4티어]: 중국 > 일본 > 유럽.
+const WORLD_ULT_RETURN={china:[.95,.85,.80,.70],japan:[.90,.80,.72,.62],europe:[.85,.75,.66,.55]};
+const worldUltReturn=t=>{const k=chinaActive()?'china':euroRun?.country==='japan'?'japan':'europe',row=WORLD_ULT_RETURN[k];return row[(t||4)-1]??row[3];};
+const conquestFinalReturn=P.returnRoll;P.returnRoll=function(ball,tier,chance,bonus=0){if(worldCampaignActive()&&ball?.ult)return worldUltReturn(ball.ultTier);const rate=conquestFinalReturn(ball,tier,chance,bonus),floor=conquestReturnFloor();return floor&&!ball?.ult?Math.max(floor,rate):rate;};
 addEventListener('pagehide',()=>{if(chinaRun?.live)persist();});
 })();
