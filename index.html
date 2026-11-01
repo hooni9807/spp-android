@@ -324,9 +324,11 @@ if(typeof document!=='undefined'){const info=document.querySelector('[data-tier=
 // Ultimate returns are an explicit per-tier rule, independent of AI difficulty bonuses.
 const ULT_RETURN_RATE={1:.50,2:.30,3:.10,4:.05};
 // AI 대전 난이도별 필살기 리턴률 [1티어,2티어,3티어,4티어]. 울트라 나이트메어 75/65/55/45%를 기준으로 아래 난이도를 맞춘다. (보스전 등 다른 모드는 위 기본값)
+// 보스전: 보스마다 대응하는 난이도의 필살기 리턴률을 쓴다.
+const BOSS_ULT_TIER={minhee:'unight',boss:'unight',godyung:'uext',aribeom:'uext',sejong:'uhard',doorjung:'uhard'};
 const ULT_RETURN_BY_TIER={easy:[.25,.15,.05,0],hard:[.35,.25,.10,.05],extreme:[.45,.35,.20,.10],ultra:[.55,.45,.30,.20],uhard:[.62,.52,.40,.30],uext:[.68,.58,.48,.38],unight:[.75,.65,.55,.45]};
 // A move's stated defensive miss chance is applied after the AI tier bonus, so it cannot be erased by a high return tier.
-function returnRoll(b,tier,chance,bonus=0){if(b?.floatFault&&b.floatReturn===true)return 1;   /* 내 실수로 뜬 공은 AI가 50% 확률로 확실히 처리 */if(b?.ult){const tt=(mode==='match'&&!net&&!rankOn)?ULT_RETURN_BY_TIER[tierNow()]:null,r=tt?tt[b.ultTier-1]??tt[3]:ULT_RETURN_RATE[b.ultTier]??.05;return conquestReturnFloor()?Math.max(.1,r):r;}   /* 세계정복: 필살기 받을 확률 최저 10% */return Math.max(0,returnChance(b,tier,chance,bonus)-Math.min(.95,Math.max(0,b.defMiss||0)));}
+function returnRoll(b,tier,chance,bonus=0){if(b?.floatFault&&b.floatReturn===true)return 1;   /* 내 실수로 뜬 공은 AI가 50% 확률로 확실히 처리 */if(b?.ult){const tt=(mode==='match'&&!net&&!rankOn)?ULT_RETURN_BY_TIER[tierNow()]:(mode==='boss'&&!net)?ULT_RETURN_BY_TIER[BOSS_ULT_TIER[aiChar]||'uext']:null,r=tt?tt[b.ultTier-1]??tt[3]:ULT_RETURN_RATE[b.ultTier]??.05;return conquestReturnFloor()?Math.max(.1,r):r;}   /* 세계정복: 필살기 받을 확률 최저 10% */return Math.max(0,returnChance(b,tier,chance,bonus)-Math.min(.95,Math.max(0,b.defMiss||0)));}
 // Rally placement reading: repeating one lane lets the AI anticipate it, while
 // alternating wide lanes makes it move and lowers its next return chance.
 let aiRouteRead={last:null,run:0,switches:0};
@@ -416,7 +418,7 @@ function step(b,dt){b.vx+=b.side*dt*(b.curveK||.3);b.vz-=(6+b.spin*EQUIP.spin*.5
 // PvP rating: start 1000, win +10 / loss -10, each extra game in a streak adds 1 more (+11, +12 ... / -11, -12 ...).
 function nextRating(o,won){const streak=won?(o.streak>0?o.streak+1:1):(o.streak<0?o.streak-1:-1),delta=won?9+streak:-9+streak;
 return {rating:o.rating+delta,wins:o.wins+(won?1:0),losses:o.losses+(won?0:1),streak,delta};}
-root.PingPhysics={resetAiRouteRead,trackAiRouteRead,shortLeft,EQUIP,back,retreatAt,incomingRetreat,OFF_T,DEEP_M,DEEP_STEP,spinMiss,normalShot,returnChance,returnRoll,ULT_RETURN_RATE,edgeSave,netCord,HIT_PAST,perfectSpan,STROKE_SPEED,STANCE_PX,CUT_FROM_BELOW,retime,power,popup,nextRating,LEVELS,RETURN_BASE,clamp,classify,timing,aiChance,shot,planServe,miss,incoming,family,judge,aiReturn,aiRhythm,step};if(typeof module!=='undefined')module.exports=root.PingPhysics;
+root.PingPhysics={resetAiRouteRead,trackAiRouteRead,shortLeft,EQUIP,back,retreatAt,incomingRetreat,OFF_T,DEEP_M,DEEP_STEP,spinMiss,normalShot,returnChance,returnRoll,ULT_RETURN_RATE,ULT_RETURN_BY_TIER,edgeSave,netCord,HIT_PAST,perfectSpan,STROKE_SPEED,STANCE_PX,CUT_FROM_BELOW,retime,power,popup,nextRating,LEVELS,RETURN_BASE,clamp,classify,timing,aiChance,shot,planServe,miss,incoming,family,judge,aiReturn,aiRhythm,step};if(typeof module!=='undefined')module.exports=root.PingPhysics;
 })(typeof window==='undefined'?globalThis:window);
 </script><script>
 'use strict';
@@ -729,7 +731,7 @@ const RANK_START=1000;let rankArmed=false,rankOn=false,rankStarting=false,rankGa
 const rankIdx=m=>{let i=0;RANK_TIERS.forEach((t,k)=>{if(m>=t.min)i=k;});return i;},rankTier=m=>RANK_TIERS[rankIdx(m)];
 function rankName(m){return rankTier(m).n;}
 function rankLocal(){try{return {mmr:RANK_START,w:0,l:0,ws:0,ls:0,peak:RANK_START,...JSON.parse(store.get('arank'))};}catch{return {mmr:RANK_START,w:0,l:0,ws:0,ls:0,peak:RANK_START};}}
-const rawRankReturnRoll=P.returnRoll;P.returnRoll=(ball,tier,chance,bonus=0)=>{const rate=rankOn&&rankGame?.returnRate,norm=rankGame?.returnNorm,ult=rankOn&&rankGame&&ball?.ult?RANK_ULT_RETURN[rankGame.opp]:null;if(ult!=null)return ult;if(rate!=null&&norm&&P.normalShot(ball))return Math.max(0,Math.min(rate,chance*rate/norm)-Math.min(.95,Math.max(0,ball.defMiss||0)));return rawRankReturnRoll(ball,tier,chance,bonus);};
+const rawRankReturnRoll=P.returnRoll;P.returnRoll=(ball,tier,chance,bonus=0)=>{const rate=rankOn&&rankGame?.returnRate,norm=rankGame?.returnNorm,ult=rankOn&&rankGame&&ball?.ult?(P.ULT_RETURN_BY_TIER[RANK_TIERS[rankGame.opp].ai]||P.ULT_RETURN_BY_TIER.uext)[ball.ultTier-1]??.45:null;   /* 랭크전: 상대 부수의 AI 난이도 기준 필살기 리턴률 */if(ult!=null)return ult;if(rate!=null&&norm&&P.normalShot(ball))return Math.max(0,Math.min(rate,chance*rate/norm)-Math.min(.95,Math.max(0,ball.defMiss||0)));return rawRankReturnRoll(ball,tier,chance,bonus);};
 function rankDayDelta(mmr,now=Date.now(),player='self'){
 const day=String(Math.floor((now+9*3600000)/(6*3600000))),key='arank-six-hour:'+player;let days={};try{days=JSON.parse(store.get(key))||{};}catch{}
 const prior=Object.keys(days).filter(d=>Number(d)<Number(day)).sort((a,b)=>Number(a)-Number(b)).at(-1),previous=prior?days[prior]:null,current=days[day];
