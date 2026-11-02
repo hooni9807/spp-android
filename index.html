@@ -2964,6 +2964,13 @@ arenaCache={w:W,h:H,c,v:view};return c;}
 const cam={z:1,cx:0,cy:0,ax:0,ay:0,t:performance.now()};
 function incomingBodyX(b){if(b.dual&&b.dualHit&&b.dualX!=null)return b.dualX;const t=b.vy<0?P.clamp((b.y-contactY())/-b.vy,0,.8):0;return P.clamp(b.x+(b.vx||0)*t+.5*(b.side||0)*(b.curveK||.3)*t*t,-.85,.85);}
 function playerWaistAt(retreat){const p=project(0,MY_FEET_Y+(me.depth||0)*.2-retreat,-.76);return p.y-legPx(p)-6*figScale(p);}
+// PERFECT 타격 이펙트: pixelfx 'impacts/crit-hit' 스프라이트 시트(MIT, patch-gg/pixelfx)를 0.6초에 재생한다.
+// 시트가 앱 빌드에서 축소돼도 맞도록 실제 이미지 폭으로 프레임 크기를 계산한다.
+const CRIT_FX={img:Object.assign(new Image(),{src:'assets/fx/crit-hit.png'}),fw:216,fh:136,px:84,py:106,cols:5,n:28,dur:600},critFxList=[];
+function critFxAt(b){const q=project(b.x,b.y,b.z);critFxList.push({x:q.x,y:q.y,s:figScale(q),t:performance.now()});if(critFxList.length>4)critFxList.shift();}
+function drawCritFx(){const F=CRIT_FX,im=F.img;if(!critFxList.length||!im.naturalWidth)return;const k=im.naturalWidth/(F.fw*F.cols),now=performance.now();ctx.save();ctx.imageSmoothingEnabled=false;
+ for(let i=critFxList.length-1;i>=0;i--){const e=critFxList[i],f=Math.floor((now-e.t)/F.dur*F.n);if(f>=F.n||f<0){critFxList.splice(i,1);continue;}const sx=(f%F.cols)*F.fw*k,sy=Math.floor(f/F.cols)*F.fh*k,sc=Math.max(.55,e.s*.62);ctx.drawImage(im,sx,sy,F.fw*k,F.fh*k,e.x-F.px*sc,e.y-F.py*sc,F.fw*sc,F.fh*sc);}
+ ctx.restore();}
 function render(){const nowC=performance.now(),cdt=Math.min((nowC-cam.t)/1000,.05);cam.t=nowC;if(!Number.isFinite(YAW.a)){YAW.a=0;YAW.c=1;YAW.s=0;YAW.px=YAW.py=0;}for(const k of['z','cx','cy','ax','ay'])if(cam[k]!=null&&!Number.isFinite(cam[k]))cam[k]=k==='z'?1:null;for(const st of[me,foe])if(st.x!=null&&!Number.isFinite(st.x)){st.x=null;st.vx=0;}   /* 한 번 NaN이 들어오면 카메라가 영원히 깨지던 문제: 스스로 복구 */
 if(ceremonyActive()){renderVictoryCeremony();return;}
 const offTable=!!(ball&&!ball.held&&ball.owner==='ai'&&ball.bounces===1&&ball.y<0&&ball.y>-1.2-P.back(ball));
@@ -2980,7 +2987,7 @@ const chase=false;
 {const inc=!!(ball&&!ball.held&&ball.owner==='ai'&&me.waistY!=null),bp=chase?project(ball.x,ball.y,ball.z):null,hx=chase?bp.x:inc?project(ball.x,contactY(),.25).x:W/2,k=Math.min(1,cdt*(chase?7:inc?4:3));
 const pan=playerWaistAt(deepS)-playerWaistAt(0);cam.cx=lerp(cam.cx||W/2,inc||chase?hx:W/2,k);cam.cy=lerp((cam.cy||H*.62)-(cam.retreatPan||0),chase?bp.y:inc?playerWaistAt(0):H*.62,k)+pan;cam.retreatPan=pan;cam.ax=lerp(cam.ax||W/2,W/2,k);cam.ay=lerp(cam.ay||H*.62,chase?H*.45:inc?H*.5:H*.62,k);}
 cam.z=baseZ;ringK=1;
-const sk=prefs.reduceMotion?0:Math.max(0,1-(time-shakeT)/.5)*10;ctx.save();ctx.translate(cam.ax+Math.sin((time-shakeT)*90)*sk*.35,cam.ay+Math.sin((time-shakeT)*65)*sk);ctx.scale(cam.z,cam.z);ctx.translate(-cam.cx,-cam.cy);renderScene();ctx.restore();courtHud();}
+const sk=prefs.reduceMotion?0:Math.max(0,1-(time-shakeT)/.5)*10;ctx.save();ctx.translate(cam.ax+Math.sin((time-shakeT)*90)*sk*.35,cam.ay+Math.sin((time-shakeT)*65)*sk);ctx.scale(cam.z,cam.z);ctx.translate(-cam.cx,-cam.cy);renderScene();drawCritFx();ctx.restore();courtHud();}
 const KIND_HINT={cut:'하회전 · 내려서 아래→위로 걸어 올리기',drive:'상회전 · 라켓 덮어서 맞드라이브 / 탭 블록',smash:'강타 · 드라이브 / 쇼트로 받기 (PERFECT 낮게 · GOOD 뜸)',spin:'회전 · 공 방향 보고 맞춰 치기',chance:'찬스볼 · 높이 뜬 공, 강하게 때리기!',kill:'찬스볼 강타 · PERFECT 낮게 · GREAT 보통 · GOOD 뜸',short:'짧은 공 · 가볍게 넘기기',serve:'서브 · 바운드 보고 받기'};
 function shotBanner(){const since=time-(net?net.opp.hitT:lastAIHit);if(!ball||ball.owner!=='ai'||ball.held||since<0||since>1.2)return;
 const kind=shotKind(ball),k=KIND[kind],a=since>.9?(1.2-since)/.3:1,pop=1+Math.max(0,.15-since)*3,fz=Math.round(Math.min(34,W*.06)*pop);
@@ -3242,7 +3249,7 @@ const inType=ball.type;if(verdict==='ok'&&!shot.miss&&!['gear','gearFloat','err'
 ball.floatFault=!!ball.chance&&!special&&(quality==='LATE'||!!flair||floatCut||driveShortFloat);
 if(special&&mode!=='trio'){const received=mir(ball);fitReturn(received,net?Math.max(.75,received.z):Infinity);Object.assign(ball,mir(received));}
 if(!net)P.trackAiRouteRead(ball);if(flair==='jaetgi'){ball.unreturn=true;ball.unreturnWhy='공 재끼기! 상대가 받을 수 없어요 · 쵸레이~';me.taunt='쵸레이~ 🔥';me.tauntT=time;}
-ball.pf=quality==='PERFECT';
+ball.pf=quality==='PERFECT';if(ball.pf&&verdict==='ok')critFxAt(ball);
 if(flair==='jaetgi');else if(verdict==='ok'&&!special&&!flair&&!shot.chance&&Math.random()<R_('utEdge')){ball.unreturn=true;ball.unreturnWhy='엣지! 🍀 상대가 받을 수 없어요';toast('엣지! 🍀 테이블 모서리에 맞았어요 · 상대가 못 받아요 (스킬)',1.6);}if(!net)deepen(P.family(inType)==='drive'&&P.family(shot.type)==='drive');lastHit=time;lastShot=shot.type;if(special&&net?.role==='guest'){net.sentHit=lastHit;sendHit();}mySwing.type=shot.type;mySwing.t=time;mySwing.ult=ult||null;smashUntil=-1;lastTap=null;
 const sp=motion?Math.hypot(motion.vx,motion.vy):0;me.amp=motion?P.clamp(.55+sp/2000,.55,1.25):tap?.45:1;me.dirX=motion?P.clamp(motion.vx/(sp||1),-1,1):0;swingMemory=null;
 if(quality==='PERFECT'&&verdict==='ok'){me.shoutT=time;if(LOOKS[charType].gamble&&!special&&!flair&&!shot.chance&&!ball.gamble&&me.gStack<3){gambleChance(me);me.gStack++;toast(`🎰 판돈 적중! 다음 대박 ${Math.round(gambleChance(me)*100)}% (${me.gStack}/3)`,1.2);}if(R_('utSteal'))aiCharge=Math.max(0,aiCharge-R_('utSteal')*100);if(!['gear','gearFloat','err','timing','spin','drunkMiss','fhFloat','bhFloat','gFloat','adamFake','overhit','tgNet','tgOut','tgFloat','spec'].includes(flair))perfectCeremony(me,LOOKS[charType]);
